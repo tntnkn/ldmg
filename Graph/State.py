@@ -16,12 +16,12 @@ class State(TypedDict):
     graph_elem                      : Union[Dict, None] 
     type                            : StateType
     force_completion                : bool
-    actions_ids                     : List[int] 
+    transitions_ids                 : List[int] 
     is_start                        : bool
     is_always_reachable             : bool
-    deletes_widget_history_force    : bool
-    deletes_widget_before_switch    : bool
-    deletes_widget_upon_session_end : bool
+    pin_widget                      : bool
+    before_enter                    : List[str]
+    before_leave                    : List[str]
 
 
 def get_dummy_state() -> State:
@@ -31,12 +31,12 @@ def get_dummy_state() -> State:
         'graph_elem'            : None,
         'type'                  : StateType.UNKNOWN,
         'force_completion'      : True,
-        'actions_ids'           : list(),
+        'transitions_ids'       : list(),
         'is_always_reachable'   : False,
         'is_start'              : False,
-        'deletes_widget_history_force'    : False,
-        'deletes_widget_before_switch'    : False,
-        'deletes_widget_upon_session_end' : False,
+        'pin_widget'            : False,
+        'before_leave'          : list(),
+        'before_enter'          : list()
     }
 
 

@@ -18,11 +18,11 @@ def main():
     print('\n')
     for node in graph.impl['elements']['nodes']:
         pass
-        #print(node, '\n')
-    print('\n')
+        print('- ', node, '\n')
+    print('===\n')
     for edge in graph.impl['elements']['edges']:
         pass
-        #print(edge, '\n')
+        print('- ', edge, '\n')
 
 
     roots = ''

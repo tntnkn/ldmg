@@ -7,22 +7,21 @@ from .Transition import Transition, TransitionType
 
 class StateFieldsConsts():
     NAME                = 'Название'
-    DEFAULT_NEXT_STATE  = 'Следующее по умолчанию'
+    TRANSITIONS         = 'Переходы'
     FORCE_COMPLETION    = 'Обязательно закончить'
-    ACTIONS             = 'Действия'
     IS_START            = 'Начало'
     IS_ALWAYS_REACHABLE = 'Всегда доступно'
-    DELETES_W_HISTORY_F = 'Удалить историю состояний при входе'
-    DELETES_W_BEFORE_SW = 'Удалить виджет перед переключением'
-    DELETES_W_UPON_END  = 'Удалить виджет в конце сессии'
+    PIN_WIDGET          = 'Закрепить виджет'
+    BEFORE_ENTER        = 'Перед входом'
+    BEFORE_LEAVE        = 'Перед уходом'
 
 
 class TransitionFieldConsts():
     NAME                = 'Название'
     TYPE                = 'Тип'
+    NEXT_STATE          = 'Следующее состояние'
     PROPERTY_NAME       = 'Свойство'
     VALUE_NAME          = 'Значение'
-    NEXT_STATE          = 'Следующее состояние'
 
 
 def load_tables():
@@ -52,23 +51,32 @@ def process_states_records(states_records) -> Dict[int,State]:
         state : State = {
             'id' : record['id'],
             'name': fields.get(
-                    StateFieldsConsts.NAME, 'NO NAME PROVIDED!'),
+                    StateFieldsConsts.NAME, 
+                    'NO NAME PROVIDED!'),
             'graph_elem' : None,
             'type': StateType.UNKNOWN,
             'force_completion' : fields.get(
-                    StateFieldsConsts.FORCE_COMPLETION, False),
-            'actions_ids' : [a_id for 
-                    a_id in fields.get( StateFieldsConsts.ACTIONS, list() )],
+                    StateFieldsConsts.FORCE_COMPLETION, 
+                    False),
+            'transitions_ids' : [
+                a_id for a_id in fields.get( 
+                    StateFieldsConsts.TRANSITIONS, 
+                    list() )],
             'is_start' : fields.get(
-                    StateFieldsConsts.IS_START, False),
+                    StateFieldsConsts.IS_START, 
+                    False),
             'is_always_reachable' : fields.get(
-                    StateFieldsConsts.IS_ALWAYS_REACHABLE, False),
-            'deletes_widget_history_force' : fields.get(
-                    StateFieldsConsts.DELETES_W_HISTORY_F, False),
-            'deletes_widget_before_switch' : fields.get(
-                    StateFieldsConsts.DELETES_W_BEFORE_SW, False),
-            'deletes_widget_upon_session_end': fields.get(
-                    StateFieldsConsts.DELETES_W_UPON_END, False),
+                    StateFieldsConsts.IS_ALWAYS_REACHABLE, 
+                    False),
+            'pin_widget' : fields.get(
+                    StateFieldsConsts.PIN_WIDGET, 
+                    False),
+            'before_enter' : fields.get(
+                    StateFieldsConsts.BEFORE_ENTER, 
+                    False),
+            'before_leave': fields.get(
+                    StateFieldsConsts.BEFORE_LEAVE, 
+                    False),
         }
 
         if   state['is_start']:
@@ -117,8 +125,8 @@ def process_records(states_records, transitions_records) ->\
             pass
 
 if __name__ == '__main__':
-    from State      import get_dummy_state
-    from Transition import get_dummy_transition
+    from .State      import get_dummy_state
+    from .Transition import get_dummy_transition
 
     s_r, t_r = load_tables()
     print('\nSTATES RECORDS') 

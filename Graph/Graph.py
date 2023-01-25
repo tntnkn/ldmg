@@ -27,7 +27,7 @@ class Graph():
 
         for key, state in states.items():
             node = self.AddNode(state) 
-            for transition_id in state['actions_ids']:
+            for transition_id in state['transitions_ids']:
                 transition = transitions[transition_id]
                 if transition['next_state_id']:
                     next_node = self.AddNode(
