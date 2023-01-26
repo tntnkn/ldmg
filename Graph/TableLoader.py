@@ -10,6 +10,7 @@ class StateFieldsConsts():
     TRANSITIONS         = 'Переходы'
     FORCE_COMPLETION    = 'Обязательно закончить'
     IS_START            = 'Начало'
+    IS_END              = 'Конец'
     IS_ALWAYS_REACHABLE = 'Всегда доступно'
     PIN_WIDGET          = 'Закрепить виджет'
     BEFORE_ENTER        = 'Перед входом'
@@ -65,6 +66,9 @@ def process_states_records(states_records) -> Dict[int,State]:
             'is_start' : fields.get(
                     StateFieldsConsts.IS_START, 
                     False),
+            'is_end' : fields.get(
+                    StateFieldsConsts.IS_END, 
+                    False),
             'is_always_reachable' : fields.get(
                     StateFieldsConsts.IS_ALWAYS_REACHABLE, 
                     False),
@@ -81,6 +85,8 @@ def process_states_records(states_records) -> Dict[int,State]:
 
         if   state['is_start']:
             state['type'] = StateType.START
+        elif  state['is_end']:
+            state['type'] = StateType.END
         elif state['is_always_reachable']:
             state['type'] = StateType.ALWAYS_REACHABLE
         else:

@@ -10,6 +10,7 @@ class Graph():
                  states:Dict[int,State],
                  transitions:Dict[int,Transition]):
         self.start_node_id : Union[int, None] = None
+        self.end_node_id   : Union[int, None] = None
         self.always_reachable_nodes_ids : List[int] = list()
 
         self.impl = {
@@ -54,6 +55,8 @@ class Graph():
 
         if state['is_start'] and self.start_node_id:
             raise StartNodeAlreadyExists(state) 
+        if state['is_end'] and self.end_node_id:
+            raise EndNodeAlreadyExists(state) 
 
         node = {
             'data': {
@@ -70,6 +73,8 @@ class Graph():
         if  state['is_start'] and not self.start_node_id:
             self.start_node_id = state['id'] 
             self.always_reachable_nodes_ids.append(state['id'])
+        elif  state['is_end'] and not self.end_node_id:
+            self.end_node_id = state['id'] 
         elif state['is_always_reachable']:
             self.always_reachable_nodes_ids.append(state['id'])
 

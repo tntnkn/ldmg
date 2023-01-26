@@ -6,6 +6,7 @@ from typing     import TypedDict, List, Dict, Union
 class StateType(IntEnum):
     UNKNOWN             = auto()
     START               = auto()
+    END                 = auto()
     ALWAYS_REACHABLE    = auto()
     REGULAR             = auto()
 
@@ -18,6 +19,7 @@ class State(TypedDict):
     force_completion                : bool
     transitions_ids                 : List[int] 
     is_start                        : bool
+    is_end                          : bool
     is_always_reachable             : bool
     pin_widget                      : bool
     before_enter                    : List[str]
@@ -34,6 +36,7 @@ def get_dummy_state() -> State:
         'transitions_ids'       : list(),
         'is_always_reachable'   : False,
         'is_start'              : False,
+        'is_end'                : False,
         'pin_widget'            : False,
         'before_leave'          : list(),
         'before_enter'          : list()

@@ -7,6 +7,8 @@ def get_node_type_class(state: State) -> str:
     match state['type']:
         case StateType.START:
             return 'start_node '
+        case StateType.END:
+            return 'end_node '
         case StateType.ALWAYS_REACHABLE:
             return 'always_reachable_node '
         case StateType.REGULAR:

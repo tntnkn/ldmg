@@ -24,7 +24,7 @@ graph_stylesheet=[
     {
         'selector': '.end_node',
         'style': {
-            'shape':    'round-diamond',
+            'shape':    'vee',
         }
     },
     {
