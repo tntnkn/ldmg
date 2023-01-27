@@ -34,6 +34,30 @@ graph_stylesheet=[
         }
     },
     {
+        'selector': '.cond_edge',
+        'style': {
+            'line-color': '#FAFAD2',
+            'target-arrow-color': '#FAFAD2',
+        }
+    },
+    {
+        'selector': '.uncond_edge',
+        'style': {
+            'line-color': '#90EE90',
+            'target-arrow-color': '#90EE90',
+        }
+    },
+    {
+        'selector': '.always_reachable_edge',
+        'style': {
+            'label': '',
+            'target-arrow-color': '#DCDCDC',
+            'line-color': '#DCDCDC',
+            'line-style': 'dashed',
+            'width'     : 1,
+        }
+    },
+    {
         'selector': '.regular_text',
         'style': {
             'target-arrow-color': '#F08080',
@@ -52,6 +76,13 @@ graph_stylesheet=[
         'style': {
             'line-color': '#778899',
             'target-arrow-color': '#778899',
+        }
+    },
+    {
+        'selector': '.button',
+        'style': {
+            'line-color': '#FAFAD2',
+            'target-arrow-color': '#FAFAD2',
         }
     },
     {

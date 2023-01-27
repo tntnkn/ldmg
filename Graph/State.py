@@ -1,23 +1,23 @@
-from enum       import IntEnum, auto, unique
+from enum       import Enum, unique
 from typing     import TypedDict, List, Dict, Union
 
+from .Types     import ID_TYPE
 
 @unique
-class StateType(IntEnum):
-    UNKNOWN             = auto()
-    START               = auto()
-    END                 = auto()
-    ALWAYS_REACHABLE    = auto()
-    REGULAR             = auto()
+class StateType(Enum):
+    UNKNOWN             = 'UNKNOWN' 
+    START               = 'START'
+    END                 = 'END'
+    ALWAYS_REACHABLE    = 'ALWAYS_REACHABLE'
+    REGULAR             = 'REGULAR'
 
 
 class State(TypedDict):
-    id                              : int
+    id                              : ID_TYPE
     name                            : str
-    graph_elem                      : Union[Dict, None] 
     type                            : StateType
     force_completion                : bool
-    transitions_ids                 : List[int] 
+    forms_ids                       : List[ID_TYPE]
     is_start                        : bool
     is_end                          : bool
     is_always_reachable             : bool
@@ -28,12 +28,11 @@ class State(TypedDict):
 
 def get_dummy_state() -> State:
     return {
-        'id'                    : 0,
+        'id'                    : '',
         'name'                  : 'dummy',
-        'graph_elem'            : None,
         'type'                  : StateType.UNKNOWN,
         'force_completion'      : True,
-        'transitions_ids'       : list(),
+        'forms_ids'             : list(),
         'is_always_reachable'   : False,
         'is_start'              : False,
         'is_end'                : False,

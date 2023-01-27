@@ -2,25 +2,30 @@
 #   1) replace string exceptions with normal ones;
 #   2) derive execptions from Exception;
 
-import Graph
-from Dash.elements  import cytograph, main_page
+from Graph             import Loader
+from DashApp           import CytoGraph
+from DashApp.elements  import cytograph, main_page
 
 from dash import Dash, Input, Output
 
 app = Dash(__name__)
 
-graph = Graph.load_graph() 
+loader = Loader()
+loader.load_graph()
+graph = loader.graph
 
+cgraph = CytoGraph(loader.graph) 
 
 def main():
-    global graph
+    global cgraph
+    global loader
 
     print('\n')
-    for node in graph.impl['elements']['nodes']:
+    for node in cgraph.impl['elements']['nodes']:
         pass
         print('- ', node, '\n')
     print('===\n')
-    for edge in graph.impl['elements']['edges']:
+    for edge in cgraph.impl['elements']['edges']:
         pass
         print('- ', edge, '\n')
 
@@ -30,7 +35,7 @@ def main():
         roots += f"#{n_id}," 
     roots = roots[0:-1]
     
-    cytograph.elements=graph.impl['elements']
+    cytograph.elements=cgraph.impl['elements']
     cytograph.layout['roots'] = roots
 
 
