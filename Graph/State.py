@@ -18,6 +18,7 @@ class State(TypedDict):
     type                            : StateType
     force_completion                : bool
     forms_ids                       : List[ID_TYPE]
+    transitions_ids                 : List[ID_TYPE]
     is_start                        : bool
     is_end                          : bool
     is_always_reachable             : bool
@@ -33,6 +34,7 @@ def get_dummy_state() -> State:
         'type'                  : StateType.UNKNOWN,
         'force_completion'      : True,
         'forms_ids'             : list(),
+        'transitions_ids'       : list(),
         'is_always_reachable'   : False,
         'is_start'              : False,
         'is_end'                : False,

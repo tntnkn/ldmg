@@ -85,13 +85,13 @@ class Loader():
         self.process_transitions_records()
         self.process_forms_records()
 
-        for state in self.graph.states.values():
+        '''for state in self.graph.states.values():
             for reach_node_id in self.graph.always_reachable_nodes_ids:
                 tr = get_always_reachable_transition(
                     state['id']+reach_node_id, 
                     state['id'],
                     reach_node_id)
-                self.graph.AddTransition(tr)
+                self.graph.AddTransition(tr)'''
 
     def process_states_records(self):
         for record in self.states_records:
@@ -109,6 +109,7 @@ class Loader():
                     a_id for a_id in fields.get( 
                         StateFieldsConsts.FORMS, 
                         list() )],
+                'transitions_ids' : list(),
                 'is_start' : fields.get(
                         StateFieldsConsts.IS_START, 
                         False),
@@ -164,7 +165,7 @@ class Loader():
                     'target_id' : fields.get(
                         TransitionFieldConsts.TARGET, None)[0],
                     'form_elem_id' : fields.get(
-                        TransitionFieldConsts.LEFT_COMP_OPER, [None])[0],
+                        TransitionFieldConsts.LEFT_COMP_OPER, list()),
                     'cond_operator' : cond_operator,
                     'cond_value' : fields.get(
                         TransitionFieldConsts.RIGHT_COMP_OPER, None),

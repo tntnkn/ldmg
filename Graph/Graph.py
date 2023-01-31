@@ -48,6 +48,8 @@ class Graph():
             raise 'Target node not in graph!'
         
         self.transitions[transition['id']] = transition
+        self.states[transition['source_id']]['transitions_ids'].append(
+                transition['id'])
 
         return transition
 
