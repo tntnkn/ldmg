@@ -4,27 +4,28 @@ import json
 
 
 class FormElem():
-    def __init__(self, field, form):
+    def __init__(self, field, group):
         self.id     = field['id']
-        self.field  = field
-        self.form   = form
+        self.group  = group
         self.text   = field['name'] 
         self.desc   = ''
         self.cb     = field['id']
         self.completed  = False
         self.storage_id = field['id']
 
-        self.form.append(self)
+        self.group.append(self)
 
     def IsCompleted(self) -> bool:
         return self.completed
 
-    def AcceptInput(self, input, storage) -> bool:
-        storage.Write(self.storage_id, input['field_id'])
-        print('Was Written', self.storage_id, storage.Contains(self.storage_id))
+    def AcceptInput(self, input, context) -> bool:
+        self.completed = True
+        context.storage.Write(self.storage_id, input['cb'])
+        return self.IsCompleted()
 
-    def Reject(self, storage):
-        storage.Delete(self.storage_id)
+    def Reject(self, context):
+        self.completed = False
+        context.storage.Delete(self.storage_id)
 
     def ToDict(self) -> Dict:
         return {
@@ -32,51 +33,66 @@ class FormElem():
             'type'  : self.type,
             'cb'    : self.cb,
             'text'  : self.text,
+            'completed' : self.completed,
         }
     def ToJson(self) -> str:
         return json.dumps( self.ToDict() )
 
 
 class RegularTextFormElem(FormElem):
-    def __init__(self, field, form):
-        super().__init__(field, form)
+    def __init__(self, field, group):
+        super().__init__(field, group)
         self.completed  = True
         self.type       = 'TEXT'
 
 
 class RegularFieldFormElem(FormElem):
-    def __init__(self, field, form):
-        super().__init__(field, form)
+    def __init__(self, field, group):
+        super().__init__(field, group)
         self.type       = 'FORM'
-
+        
 
 class DynamicFieldFormElem(FormElem):
-    def __init__(self, field, form):
-        super().__init__(field, form)
+    def __init__(self, field, group):
+        super().__init__(field, group)
         self.type       = 'D_FORM'
 
 
 class ButtonFormElem(FormElem):
-    def __init__(self, field, form):
-        super().__init__(field, form)
+    def __init__(self, field, group):
+        super().__init__(field, group)
         self.type       = 'BUTTON'
+
+    def AcceptInput(self, input, context) -> bool:
+        super().AcceptInput(input, context)
+        context.state_history.SetNext(
+            context.branches.FieldIdToNextId(self.id) )
+        context.state_history.SwitchToNext()
 
 
 class SingleChoiceFormElem(FormElem):
-    def __init__(self, field, form):
-        super().__init__(field, form)
+    def __init__(self, field, group):
+        super().__init__(field, group)
         self.type       = 'S_CHOICE'
+
+    def AcceptInput(self, input, context) -> bool:
+        if self.completed:
+            self.Reject(context)
+            return self.IsCompleted()
+        for groupee in self.group:
+            groupee.Reject(context)
+        return super().AcceptInput(input, context)
 
 
 class MultiChoiceFormElem(FormElem):
-    def __init__(self, field, form):
-        super().__init__(field, form)
+    def __init__(self, field, group):
+        super().__init__(field, group)
         self.type       = 'M_CHOICE'
 
 
 class DocumentFormElem(FormElem):
-    def __init__(self, field, form):
-        super().__init__(field, form)
+    def __init__(self, field, group):
+        super().__init__(field, group)
         self.type       = 'DOCUMENT'
 
 
@@ -85,15 +101,7 @@ class Form():
     def __init__(self, state, fields):
         self.id             = state['id']
         self.fields         = OrderedDict()
-        self.changed_fields = list()
-
-        self.regular_texts  = list()
-        self.regular_fields = list()
-        self.dynamic_fields = list()
-        self.single_choises = list()
-        self.multi_choises  = list()
-        self.buttons        = list()
-        self.documents      = list()
+        self.changed_fields = dict()
 
         self.can_go_next    = False
         self.can_go_prev    = False
@@ -118,24 +126,32 @@ class Form():
             'text'      : 'ВСЁ',
         }
 
+        regular_texts  = list()
+        regular_fields = list()
+        dynamic_fields = list()
+        single_choises = list()
+        multi_choises  = list()
+        buttons        = list()
+        documents      = list()
+
         for f in fields: 
             field = None
             print("-- F TYPE IS ", f['type'].value)
             match f['type'].value:
                 case FormType.REGULAR_TEXT:
-                    field = RegularTextFormElem(f, self.regular_texts)
+                    field = RegularTextFormElem(f, regular_texts)
                 case FormType.REGULAR_FIELD:
-                    field = RegularFieldFormElem(f, self.regular_fields)
+                    field = RegularFieldFormElem(f,regular_fields)
                 case FormType.DYNAMIC_FIELD:
-                    field = DynamicFieldFormElem(f, self.dynamic_fields)
+                    field = DynamicFieldFormElem(f,dynamic_fields)
                 case FormType.BUTTON:
-                    field = ButtonFormElem(f, self.buttons)
+                    field = ButtonFormElem(f, buttons)
                 case FormType.SINGLE_CHOICE:
-                    field = SingleChoiceFormElem(f, self.single_choises)
+                    field = SingleChoiceFormElem(f,single_choises)
                 case FormType.MULTI_CHOICE:
-                    field = MultiChoiceFormElem(f, self.multi_choises)
+                    field = MultiChoiceFormElem(f,multi_choises)
                 case FormType.DOCUMENT:
-                    field = DocumentFormElem(f, self.documents)
+                    field = DocumentFormElem(f,documents)
                 case _:
                     print("NO MATCH!")
                     raise 'Cannot make form, unsupported type!'
@@ -147,13 +163,16 @@ class Form():
                 return False
         return True
 
-    def AcceptInput(self, input, storage) -> bool:
-        field = self.fields[input['field_id']]
-        field.AcceptInput(input, storage)
+    def IsFieldCompleted(self, field_id):
+        return self.fields[field_id].IsCompleted()
 
-    def Reject(self, storage):
+    def AcceptInput(self, input, context) -> bool:
+        field = self.fields[input['field_id']]
+        field.AcceptInput(input, context)
+
+    def Reject(self, context):
         for field in self.fields.values():
-            field.Reject(storage)
+            field.Reject(context)
 
     def ToDict(self) -> Dict:
         repr = list()
@@ -188,62 +207,136 @@ class FormPrototypeFactory():
                 except:
                     pass
 
-    def MakeForm(id):
+    def Make(form_id):
         from copy import deepcopy
-        return deepcopy(FormPrototypeFactory.prototypes.get(id, None)) 
+        return deepcopy(FormPrototypeFactory.prototypes.get(form_id, None))
+
+class StateFactory():
+    state_cls = None
+
+    def INIT(state_cls):
+        StateFactory.state_cls = state_cls
+
+    def Make(state, context):
+        return StateFactory.state_cls(state, context)
+
+
+class Branch():
+    def __init__(self, fields_ids, next_id):
+        self.fields_ids    = fields_ids
+        self.next_state_id = next_id
+
+    def HasConditions(self):
+        return len(self.fields_ids) != 0
+
+    def HasCondition(self, field_id):
+        return field_id in self.fields_ids
+
+    def GetNextId(self):
+        return self.next_state_id
+
+    def GetConditions(self):
+        return iter(self.fields_ids)
+
+
+class StateBranches():
+    def __init__(self, state, transitions):
+        self.branches = [
+            Branch(transitions[tr_id]['form_elem_id'],
+                   transitions[tr_id]['target_id'])
+                for tr_id in state['transitions_ids']
+        ]
+        self.form_id_cache = dict()
+
+    def FieldIdToNextId(self, form_id):
+        if form_id not in self.form_id_cache:
+            self.form_id_cache[form_id] = self.__FindNextId(form_id)
+        return self.form_id_cache[form_id]
+
+    def __FindNextId(self, field_id):
+        for branch in self.branches:
+            if branch.HasCondition(field_id):
+                return branch.GetNextId()
+        raise f"No branch with field condition {form_id}"
+
+    def __iter__(self):
+        return iter(self.branches)
+
+    def __len__(self):
+        return len(self.branches)
 
 
 class State():
+    class ContextForForm():
+        def __init__(self):
+            self.state_history = None
+            self.state_branches= None
+            self.storage       = None
+
     def __init__(self, state, context):
-        self.id     = state['id']
-        self.state  = state
-        self.form   = FormPrototypeFactory.MakeForm(state['id'])
-        self.next_id= None
-        self.context=context
+        self.id       = state['id']
+        self.state    = state
+        self.branches = StateBranches(state, context.graph.transitions)
+        self.next_id  = None
+        self.context  = context
+        self.form     = FormPrototypeFactory.Make(state['id'])
 
-        transitions = context.graph.transitions
-        self.branches = [
-            {'conds'         : transitions[tr_id]['form_elem_id'],
-             'next_state_id' : transitions[tr_id]['target_id'] }
-                for tr_id in state['transitions_ids']
-        ]
-
+        self.form_context = self.__GetContextForForm(context)
+        print( self.next_id )
         self.DetermineNextState()
-        self.AdjustFormButtons() 
-
-    def IsCompleted(self) -> bool:
-        if self.state['force_completion']:
-            return self.form.IsCompleted()
-        return True
-
-    def AcceptInput(self, input) -> bool:
-        self.form.AcceptInput(input, self.context.storage)
-        self.DetermineNextState()
-        self.AdjustFormButtons()
+        print("NEW STATE")
+        print( self.id )
+        print( self.next_id )
         print( self.HasNext() )
         print( self.context.state_history.CanSwitchToNext() )
 
+    def AcceptInput(self, input) -> bool:
+        self.form.AcceptInput(input, self.form_context)
+        self.DetermineNextState()
+        print( self.HasNext() )
+        print( self.context.state_history.CanSwitchToNext() )
+
+    def Reject(self):
+        self.form.Reject(self.form_context)
+
+    def SetNext(self, next_id):
+        self.next_id = next_id
+        return self.next_id
+
+    def GetNextId(self):
+        return self.next_id
+
+    def HasNext(self):
+        return self.next_id is not None
+
+    def GetForm(self):
+        self.AdjustFormButtons()
+        return self.form.ToJson()
+
+    def TestGetForm(self):
+        self.AdjustFormButtons()
+        return self.form.ToDict()
+
+    def IsEnd(self):
+        return len(self.branches) == 0
+
     def DetermineNextState(self):
         for branch in self.branches:
-            if len(branch['conds']) == 0:
-                self.next_id = branch['next_state_id']
-                print(self.next_id)
-                return self.next_id
-            for cond in branch['conds']:
+            if not branch.HasConditions():
+                return self.SetNext( branch.next_state_id )
+            for cond in branch.GetConditions():
                 print('Cond is', cond)
-                if not self.context.storage.Contains(cond):
+                if not self.form.IsFieldCompleted(cond):
                     break
-                self.next_id = branch['next_state_id']
-                return self.next_id
-        self.next_id = None
-        return self.next_id
+                return self.SetNext( branch.next_state_id )
+        return self.SetNext(None)
 
     def AdjustFormButtons(self):
         if self.context.state_history.CanSwitchToPrev():
             self.form.can_go_prev = True
         else:
             self.form.can_go_prev = False
-        if self.HasNext() or self.context.state_history.CanSwitchToNext():
+        if self.HasNext():
             self.form.can_go_next = True
         else:
             self.form.can_go_next = False
@@ -252,23 +345,12 @@ class State():
         else:
             self.form.can_be_done = False
 
-    def GetForm(self):
-        return self.form.ToJson()
-
-    def TestGetForm(self):
-        return self.form.ToDict()
-
-    def GetNextId(self):
-        return self.next_id
-
-    def Reject(self):
-        self.form.Reject(self.context.storage)
-
-    def HasNext(self):
-        return self.next_id is not None
-
-    def IsEnd(self):
-        return len(self.branches) == 0
+    def __GetContextForForm(self, context):
+        form_context               = State.ContextForForm()
+        form_context.state_history = context.state_history
+        form_context.branches      = self.branches
+        form_context.storage       = context.storage
+        return form_context
 
 
 class StateHistory():
@@ -288,17 +370,11 @@ class StateHistory():
 
     def SetNext(self, state_id):
         if self.CanSwitchToNext() and self.GetNextState().id == state_id:
-            self.idx += 1
-            return
+            return state_id
         while len(self.history)-1 > self.idx:
             self.history.pop().Reject()
-
-        self.idx += 1
-        try:
-            self.history.append( 
-                State(self.context.graph.states[state_id], self.context))
-        except:
-            self.idx -= 1
+        self.history.append(StateFactory.Make(
+            self.context.graph.states[state_id], self.context) )
 
     def SwitchToNext(self) -> State:
         if self.CanSwitchToNext():
@@ -307,6 +383,7 @@ class StateHistory():
             raise "Cannot switch next -- no next!"
 
     def SwitchToPrev(self) -> State:
+        self.__PrintHistory()
         if self.CanSwitchToPrev():
             self.idx -= 1
         else:
@@ -314,6 +391,11 @@ class StateHistory():
 
     def GetNextState(self):
         return self.history[self.idx+1]
+
+    def __PrintHistory(self):
+        print("History is: ")
+        for state in self.history:
+            print(state.id)
 
 
 class StateMachine():
@@ -336,17 +418,18 @@ class StateMachine():
             pass
         elif input['field_id'] == 'next':
             if state.HasNext():
-                next_id = state.GetNextId()
-                sh.SetNext(next_id)
-            else:
-                sh.SwitchToNext()
+                sh.SetNext( state.GetNextId() )
+            sh.SwitchToNext()
         elif input['field_id'] == 'prev':
             sh.SwitchToPrev()
         elif input['field_id'] == 'done':
             print("WE ARE DONE!")
+            raise UserDone
         else:
             state.AcceptInput(input)
 
+class UserDone(Exception):
+    pass
 
 class UserInputStorage():
     def __init__(self, fields):
