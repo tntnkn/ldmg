@@ -36,28 +36,56 @@ def main():
     i = None
     try:
         while True:
-            print_form( context.state_machine.TestGo(i) ) 
-            i = get_input()
+            form = context.state_machine.TestGo(i)
+            print('Form is', form)
+            for f in form:
+                print(f)
+            mapping = print_form(form)
+            i = get_input_to_return(mapping)
     except UserDone:
-        print(storage.storage)
+        for key, value in storage.storage.items():
+            print(forms[key]['name'], ' - ', value)
 
-
-def get_input() -> Input:
+def get_input_to_return(mapping) -> Input:
     i = input('Gimme input: ')
+
     if len(i) == 0:
-        i = None
-    return {
-        'type'          : 'dunno',
-        'session_id'    : None,
-        'field_id'      : i,
-        'cb'            : i,
+        return None
+    elif not i.isdigit():
+        return None
+    
+    idx = int(i)
+    if idx > len(mapping)-1:
+        return None
+
+    f = mapping[idx]
+    ret =  {
+            'type'          : f['type'],
+            'session_id'    : None,
+            'field_id'      : f['id'],
+            'cb'            : f['cb'],
     }
+
+    if ret['type'] == 'FORM':
+        ret['cb'] = input('Gimme smth to write to a form: ')
+    elif ret['type'] == 'D_FORM' or ret['type'] == 'D_FORM_CHIEF':
+        ret['cb'] = input('Gimme smth to write to a form: ')
+        ret['d_id'] = f['d_id']
+
+    return ret
+
 
 def print_form(form):
     print('\nFORM:')
+    mapping = list()
+    cnt = 0
     for field in form:
-        print(field['text'], field['type'], field['cb'])
-        
+        print(cnt, field['text'], field['type'], field['cb'])
+        mapping.append(field)
+        cnt += 1
+    return mapping
+       
+
 
 if __name__ == '__main__':
     main()
