@@ -38,6 +38,9 @@ class FormElem():
     def ToJson(self) -> str:
         return json.dumps( self.ToDict() )
 
+    def AddRepr(self, where):
+        where.append( self.ToDict() )
+
 
 class RegularTextFormElem(FormElem):
     def __init__(self, field, group):
@@ -50,13 +53,102 @@ class RegularFieldFormElem(FormElem):
     def __init__(self, field, group):
         super().__init__(field, group)
         self.type       = 'FORM'
+        self.def_text   = self.text
         
+    def AcceptInput(self, input, context) -> bool:
+        if input['cb'] == '':
+            self.Reject(context)
+        else:
+            super().AcceptInput(input, context)
+            self.text = input['cb']
+
+    def Reject(self, context):
+        super().Reject(context)
+        self.text = self.def_text
+
 
 class DynamicFieldFormElem(FormElem):
+    class D_RegularFieldFormElem(FormElem):
+        def __init__(self, field, group):
+            super().__init__(field, group)
+            self.d_id   = field['d_id']
+            self.type   = 'D_FORM'
+        
+        def AcceptInput(self, input, context) -> bool:
+            if input['cb'] == '':
+                self.Reject(context)
+            else:
+                self.text = input['cb']
+                self.completed = True
+
+        def Reject(self, storage):
+            self.group.pop( self.group.index(self) )
+            self.completed = False
+
+        def ToDict(self) -> Dict:
+            my_repr = super().ToDict()
+            my_repr['d_id'] = self.d_id
+            return my_repr
+
     def __init__(self, field, group):
         super().__init__(field, group)
-        self.type       = 'D_FORM'
+        self.type       = 'D_FORM_CHIEF'
+        self.d_fields   = list()
+        self.d_id       = None
+        self.last_d_id  = 0
+        
+    def AcceptInput(self, input, context):
+        if input['d_id'] is not None:
+            self.__InputToOldDField(input, context)
+        else:
+            self.__InputToNewDField(input)
+        
+        if len(self.d_fields) == 0:
+            self.completed = False
+        else:
+            self.completed = True
+            self.__StoreText(context)
 
+    def ToDict(self) -> Dict:
+        my_repr = super().ToDict()
+        my_repr['d_id'] = self.d_id
+        ret = list()
+        ret.append(my_repr)
+        for d_field in self.d_fields:
+            ret.append( d_field.ToDict() )
+        return ret
+
+    def AddRepr(self, where):
+        where.extend( self.ToDict() )
+
+    def __InputToOldDField(self, input, context):
+        for  d_field in self.d_fields:
+            if d_field.d_id == input['d_id']:
+                d_field.AcceptInput(input, context)
+                ok = True
+                return
+        raise 'Dynamic field is not present!'
+
+    def __InputToNewDField(self, input):
+        if input['cb'] == '':
+            return
+        self.last_d_id += 1
+        new_form_field = {
+            'name'      : input['cb'],
+            'desc'      : input['cb'],
+            'id'        : self.id,
+            'd_id'      : self.last_d_id,
+        }
+        DynamicFieldFormElem.D_RegularFieldFormElem(
+                new_form_field, self.d_fields)
+
+    def __StoreText(self, context):
+        text = ''
+        for d_field in self.d_fields:
+            text += d_field.text + ', '
+        text = text[:-2]
+        context.storage.Write(self.storage_id, text)
+         
 
 class ButtonFormElem(FormElem):
     def __init__(self, field, group):
@@ -89,6 +181,12 @@ class MultiChoiceFormElem(FormElem):
         super().__init__(field, group)
         self.type       = 'M_CHOICE'
 
+    def AcceptInput(self, input, context) -> bool:
+        if self.completed:
+            self.Reject(context)
+            return self.IsCompleted()
+        return super().AcceptInput(input, context)
+
 
 class DocumentFormElem(FormElem):
     def __init__(self, field, group):
@@ -108,19 +206,19 @@ class Form():
         self.can_be_done    = False
 
         self.next_b_tpl     = {
-            'id'        : 'NEXT',
+            'id'        : 'next',
             'type'      : 'BUTTON',
             'cb'        : 'next',
             'text'      : 'ДАЛЕЕ',
         }
         self.prev_b_tpl     = {
-            'id'        : 'PREV',
+            'id'        : 'prev',
             'type'      : 'BUTTON',
             'cb'        : 'prev',
             'text'      : 'НАЗАД',
         }
         self.done_b_tpl     = {
-            'id'        : 'DONE',
+            'id'        : 'done',
             'type'      : 'BUTTON',
             'cb'        : 'done',
             'text'      : 'ВСЁ',
@@ -175,9 +273,10 @@ class Form():
             field.Reject(context)
 
     def ToDict(self) -> Dict:
+        import itertools 
         repr = list()
         for field in self.fields.values():
-            repr.append( field.ToDict() )
+            field.AddRepr(repr)
         if self.can_go_prev:
             repr.append(self.prev_b_tpl)
         if self.can_go_next:
@@ -282,19 +381,15 @@ class State():
         self.form     = FormPrototypeFactory.Make(state['id'])
 
         self.form_context = self.__GetContextForForm(context)
-        print( self.next_id )
         self.DetermineNextState()
-        print("NEW STATE")
-        print( self.id )
-        print( self.next_id )
-        print( self.HasNext() )
-        print( self.context.state_history.CanSwitchToNext() )
+        #print( self.HasNext() )
+        #print( self.context.state_history.CanSwitchToNext() )
 
     def AcceptInput(self, input) -> bool:
         self.form.AcceptInput(input, self.form_context)
         self.DetermineNextState()
-        print( self.HasNext() )
-        print( self.context.state_history.CanSwitchToNext() )
+        #print( self.HasNext() )
+        #print( self.context.state_history.CanSwitchToNext() )
 
     def Reject(self):
         self.form.Reject(self.form_context)
