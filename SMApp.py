@@ -1,5 +1,8 @@
-from Graph import Loader
-from Forms import FormPrototypeFactory, Context, UserInputStorage, Input, State, StateFactory, UserDone
+from Graph              import Loader
+from Forms              import StorageFactory, ActiveUsersFactory
+from Backend.Factories  import FormPrototypeFactory
+from Backend.StateMachine import StateMachine, UserDone
+
 
 def main():
     print("Loading graph")
@@ -24,19 +27,20 @@ def main():
         copy.id = 'LALALA'
         print('- ', form.id, copy.id)
 
+    StorageFactory.INIT(graph, forms)
+    storage = StorageFactory.Make()
+    ActiveUsersFactory.INIT(storage)
+    active_users = ActiveUsersFactory.Make()
 
-    StateFactory.INIT(State)
+    user_id = 0
+    active_users.AddUser(user_id)
+    context = active_users.GetUserContext(user_id)
 
-    print('\nCreating Context')
-    storage = UserInputStorage(forms)
-    context = Context(storage, graph)
-    context.state_history.SetNext(graph.start_node_id)
-    context.state_history.SwitchToNext()
-
+    SM = StateMachine()    
     i = None
     try:
         while True:
-            form = context.state_machine.TestGo(i)
+            form = SM.Go(context, i)
             print('Form is', form)
             for f in form:
                 print(f)
@@ -46,7 +50,7 @@ def main():
         for key, value in storage.storage.items():
             print(forms[key]['name'], ' - ', value)
 
-def get_input_to_return(mapping) -> Input:
+def get_input_to_return(mapping):
     i = input('Gimme input: ')
 
     if len(i) == 0:
