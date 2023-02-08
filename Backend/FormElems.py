@@ -1,29 +1,37 @@
 from .Interface     import FormElem
 from .StateHistory  import StateHistory
-from .Exceptions    import FormElemSwitchedHistory
+from .Exceptions    import FormElemSwitchedHistory, WrongDynamicField
+from .Storage       import Context, Models as M
+from typing         import List, Dict, Union
 
 
 class RegularTextFormElem(FormElem):
-    def __init__(self, field, group):
+    def __init__(self, field, group: List[FormElem]):
         super().__init__(field, group)
-        self.type       = 'TEXT'
+        self.type: str = 'TEXT'
 
-    def IsCompleted(self, context):
+    def AcceptInput(self, input, context: Context):
+        raise NotImplementedError
+
+    def Reject(self, context: Context) -> None:
+        raise NotImplementedError
+
+    def IsCompleted(self, context: Context) -> bool:
         return True
 
 
 class RegularFieldFormElem(FormElem):
-    def __init__(self, field, group):
+    def __init__(self, field, group: List[FormElem]):
         super().__init__(field, group)
-        self.type       = 'FORM'
+        self.type: str = 'FORM'
         
-    def AcceptInput(self, input, context):
+    def AcceptInput(self, input, context: Context) -> None:
         if input['cb'] == '':
             self.Reject(context)
         else:
             super().AcceptInput(input, context)
 
-    def ToDict(self, context):
+    def ToDict(self, context: Context) -> Dict:
         d = super().ToDict(context)
         t = context.user_input.Read(self.storage_id)
         if t is not None:
@@ -34,28 +42,28 @@ class RegularFieldFormElem(FormElem):
 class DynamicFieldFormElem(FormElem):
     SEPARATOR = ', '
 
-    def __init__(self, field, group):
+    def __init__(self, field, group: List[FormElem]):
         super().__init__(field, group)
-        self.type       = 'D_FORM_CHIEF'
-        self.d_id       = None
+        self.type: str               = 'D_FORM_CHIEF'
+        self.d_id: Union[M.ID, None] = None
         
-    def AcceptInput(self, input, context):
+    def AcceptInput(self, input, context: Context) -> None:
         cb = None 
         if input['d_id'] is not None:
             cb = self.__InputToOldDField(input, context)
         else:
             cb = self.__InputToNewDField(input, context)
 
-        if cb is None:
+        if len(cb) == 0:
             super().Reject(context)
         else:
             input['cb'] = cb
             super().AcceptInput(input, context)
         
-    def ToDict(self, context):
+    def ToDict(self, context: Context) -> List[Dict]:
         my_repr = super().ToDict(context)
         my_repr['d_id'] = None
-        ret = list()
+        ret: List[Dict] = list()
         ret.append(my_repr)
         d_fields_s = context.user_input.Read(self.storage_id)
         if d_fields_s is None: 
@@ -72,42 +80,39 @@ class DynamicFieldFormElem(FormElem):
             } )
         return ret
 
-    def AddRepr(self, where, context):
+    def AddRepr(self, where: List, context: Context) -> None:
         where.extend( self.ToDict(context) )
 
-    def __InputToOldDField(self, input, context):
+    def __InputToOldDField(self, input, context: Context) -> str:
         d_fields = context.user_input.Read(self.storage_id).split(
             DynamicFieldFormElem.SEPARATOR)
         if input['d_id'] > len(d_fields)-1:
-            raise 'Dynamic field is not present!'
+            raise WrongDynamicField(self.id)
         if input['cb'] == '':
             d_fields.pop( input['d_id'] )
         else:
             d_fields[ input['d_id'] ] = input['cb']
-        print(" OLD D_FIELDS ARE ", d_fields)
-        if len(d_fields) == 0:
-            return None
-        return DynamicFieldFormElem.SEPARATOR.join(d_fields)
+        return DynamicFieldFormElem.SEPARATOR.join(d_fields).strip()
 
-    def __InputToNewDField(self, input, context):
-        if input['cb'] == '':
-            return
+    def __InputToNewDField(self, input, context: Context) -> str:
         d_fields_s = context.user_input.Read(self.storage_id) 
+        if input['cb'] == '':
+            if d_fields_s is None:
+                return ''
+            return d_fields_s.strip()
         if d_fields_s is None:
             d_fields_s = input['cb']
         else:
             d_fields_s += DynamicFieldFormElem.SEPARATOR + input['cb']
-        print(" NEW D_FIELDS ARE ", d_fields_s)
-        return d_fields_s         
+        return d_fields_s.strip()        
 
 
 class ButtonFormElem(FormElem):
-    def __init__(self, field, group):
+    def __init__(self, field, group: List[FormElem]):
         super().__init__(field, group)
-        self.type       = 'BUTTON'
+        self.type: str = 'BUTTON'
 
-    def AcceptInput(self, input, context):
-
+    def AcceptInput(self, input, context: Context) -> None:
         super().AcceptInput(input, context)
         next_id = self.FormElemToNext(context)
         StateHistory.SetNext(next_id, context)
@@ -116,11 +121,11 @@ class ButtonFormElem(FormElem):
     
 
 class SingleChoiceFormElem(FormElem):
-    def __init__(self, field, group):
+    def __init__(self, field, group: List[FormElem]):
         super().__init__(field, group)
         self.type       = 'S_CHOICE'
 
-    def AcceptInput(self, input, context):
+    def AcceptInput(self, input, context: Context) -> None:
         if self.IsCompleted(context):
             self.Reject(context)
         for groupee in self.group:
@@ -129,12 +134,12 @@ class SingleChoiceFormElem(FormElem):
 
 
 class MultiChoiceFormElem(FormElem):
-    def __init__(self, field, group):
+    def __init__(self, field, group: List[FormElem]):
         super().__init__(field, group)
         self.type       = 'M_CHOICE'
 
-    def AcceptInput(self, input, context):
-        if self.IsCompleted():
+    def AcceptInput(self, input, context: Context) -> None:
+        if self.IsCompleted(context):
             self.Reject(context)
         return super().AcceptInput(input, context)
 

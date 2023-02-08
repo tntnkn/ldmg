@@ -4,16 +4,18 @@ from .Factories     import FormElemFactory
 from .Interface     import FormElem
 from .StateHistory  import StateHistory
 from .Exceptions    import FormElemSwitchedHistory
+from .Storage       import Context, Models as M
+from typing         import Dict, List
+import json
 
 
 class Form():
-    def __init__(self, form_id, fields):
+    def __init__(self, form_id: M.ID, fields):
         self.id             = form_id 
         self.fields         = OrderedDict()
 
-        self.can_go_next    = False
-        self.can_go_prev    = False
-        self.can_be_done    = False
+        for f in fields: 
+            self.fields[f['id']] = FormElemFactory.Make(f)
 
         self.next_b_tpl     = {
             'id'        : 'next',
@@ -34,19 +36,16 @@ class Form():
             'text'      : 'ВСЁ',
         }
 
-        for f in fields: 
-            self.fields[f['id']] = FormElemFactory.Make(f)
-
-    def IsCompleted(self, context):
-        for field in self.form:
+    def IsCompleted(self, context: Context) -> bool:
+        for field in self.fields:
             if not field.IsCompleted(context):
                 return False
         return True
 
-    def IsFieldCompleted(self, field_id):
+    def IsFieldCompleted(self, field_id: M.ID) -> bool:
         return self.fields[field_id].IsCompleted()
 
-    def AcceptInput(self, input, context):
+    def AcceptInput(self, input, context: Context) -> None:
         field = self.fields[input['field_id']]
         try:
             field.AcceptInput(input, context)
@@ -55,12 +54,12 @@ class Form():
         next_id = StateHistory.DetermineNextState(context)
         StateHistory.SetNext(next_id, context)
 
-    def Reject(self, context):
+    def Reject(self, context: Context) -> None:
         for field in self.fields.values():
             field.Reject(context)
 
-    def ToDict(self, context):
-        repr = list()
+    def ToDict(self, context: Context) -> List[Dict]:
+        repr: List[Dict] = list()
         for field in self.fields.values():
             field.AddRepr(repr, context)
         if   StateHistory.CanSwitchToPrev(context):
@@ -71,6 +70,6 @@ class Form():
             repr.append(self.done_b_tpl)
         return repr
 
-    def ToJson(self):
-        return json.dumps( self.ToDict() )
+    def ToJson(self, context) -> str:
+        return json.dumps( self.ToDict(context) )
 

@@ -1,11 +1,16 @@
 from ..Storage  import ActiveUsers
+from ..Storage  import StorageInterface
+from typing     import Union
+
 
 class ActiveUsersFactory():
+    storage: StorageInterface
 
-    storage = None
-    def INIT(storage):
+    @staticmethod
+    def INIT(storage: StorageInterface) -> None:
         ActiveUsersFactory.storage = storage
 
-    def Make():
+    @staticmethod
+    def Make() -> ActiveUsers:
         return ActiveUsers(ActiveUsersFactory.storage)
 

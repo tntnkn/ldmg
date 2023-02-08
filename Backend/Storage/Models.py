@@ -5,8 +5,7 @@ ID = str
 UserInput = Dict[ID, Union[str, None]]
 
 class UserContext(TypedDict):
-    current_state_id    : ID 
-    next_state_idx      : int
+    current_state_idx   : int 
     state_history       : List[ID]
 
 class Branch(TypedDict):
@@ -24,6 +23,6 @@ class MainStorageContents(TypedDict):
 MainStorage = Dict[ID, MainStorageContents]
 
 class GeneralInfo(TypedDict):
-    brahches            : StatesBranchesStorage
+    branches            : StatesBranchesStorage
     start_id            : ID
 

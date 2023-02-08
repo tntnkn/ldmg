@@ -1,28 +1,34 @@
+from .Exceptions    import CantSwitch
+from .Storage       import Models as M
+from .Storage       import Context 
+from typing         import Union
+
+
 class StateHistory():
-    def GetCurrent(context):
+    @staticmethod
+    def GetCurrent(context: Context) -> M.ID:
         idx = context.user_context.Read('current_state_idx')
         hst = context.user_context.Read('state_history')
         return hst[idx]
 
-    def GetNext(context):
+    @staticmethod
+    def GetNext(context: Context) -> M.ID:
         idx = context.user_context.Read('current_state_idx') + 1
         hst = context.user_context.Read('state_history')
         return hst[idx]
 
-    def SetNext(next_id, context):
+    @staticmethod
+    def SetNext(next_id, context: Context) -> None:
         idx = context.user_context.Read('current_state_idx')
         hst = context.user_context.Read('state_history')
-        print(idx)
-        print(hst)
         if len(hst)-1 > idx and hst[idx+1]==next_id:
             return
         hst=hst[0:idx+1]
-        print(hst)
         hst.append(next_id)
-        print(hst)
         context.user_context.Write('state_history', hst)
 
-    def DetermineNextState(context):
+    @staticmethod
+    def DetermineNextState(context: Context) -> Union[M.ID, None]:
         cur_id   = StateHistory.GetCurrent(context)
         branches = context.general_info.Read('branches')[cur_id]
         u_input  = context.user_input
@@ -37,37 +43,36 @@ class StateHistory():
                 return branch['resulting_state_id']
         return None
 
-    def AtEnd(context):
+    @staticmethod
+    def AtEnd(context: Context) -> bool:
         cur_id   = StateHistory.GetCurrent(context)
         branches = context.general_info.Read('branches')[cur_id]
         return len(branches) == 0
 
-    def CanSwitchToNext(context):
+    @staticmethod
+    def CanSwitchToNext(context: Context) -> bool:
         idx = context.user_context.Read('current_state_idx')
         hst = context.user_context.Read('state_history')
-        print(idx)
-        print(len(hst))
         return len(hst)-1 > idx
 
-    def CanSwitchToPrev(context):
+    @staticmethod
+    def CanSwitchToPrev(context: Context) -> bool:
         idx = context.user_context.Read('current_state_idx')
         return idx > 0
 
-    def SwitchToNext(context):
+    @staticmethod
+    def SwitchToNext(context: Context) -> None:
         if StateHistory.CanSwitchToNext(context):
             idx = context.user_context.Read('current_state_idx')
             context.user_context.Write('current_state_idx', idx + 1)
         else:
-            raise "Cannot switch next -- no next!"
+            raise CantSwitch("No next!")
 
-    def SwitchToPrev(context):
+    @staticmethod
+    def SwitchToPrev(context: Context) -> None:
         if StateHistory.CanSwitchToPrev(context):
             idx = context.user_context.Read('current_state_idx')
             context.user_context.Write('current_state_idx', idx - 1)
         else:
-            raise "Cannot switch prev -- no prev!"
-
-    def __PrintHistory(context):
-        print("History is: ")
-        pass
+            raise CantSwitch("No prev!")
 

@@ -1,3 +1,6 @@
+from ..Exceptions   import OperationIsNotSupported
+
+
 class StorageView():
     def __init__(self, storage_part):
         self.storage = storage_part 
@@ -32,10 +35,10 @@ class GeneralInfoStorage(StorageView):
         super().__init__(general_info)
 
     def Write(self, key, value):
-        raise 'Operation "Write" is not supported!'
+        raise OperationIsNotSupported('Write') 
 
     def Delete(self, key):
-        raise 'Operation "Delete" is not supported!'
+        raise OperationIsNotSupported('Delete') 
 
 class Context():
     def __init__(self, user_input, user_context, general_info):

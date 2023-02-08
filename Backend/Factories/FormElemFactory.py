@@ -1,12 +1,15 @@
 from ..FormElems    import *
+from ..Interface    import FormElem
 from ..Types        import FormType
+from ..Exceptions   import UnsupportedFormElemType
+from typing         import List
 
 
 class FormElemFactory():
     prev_field_type   = None
-    current_group     = list()
+    current_group: List[FormElem] = list()
 
-    def Make(graph_field):
+    def Make(graph_field) -> FormElem:
         if graph_field['type'].value!=FormElemFactory.prev_field_type:
             FormElemFactory.prev_field_type = graph_field['type']    
             FormElemFactory.current_group   = list()
@@ -25,8 +28,7 @@ class FormElemFactory():
                 return SingleChoiceFormElem(graph_field, g)
             case FormType.MULTI_CHOICE:
                 return MultiChoiceFormElem(graph_field, g)
-            case FormType.DOCUMENT:
-                return DocumentFormElem(graph_field, g)
             case _:
-                raise 'Cannot make form, unsupported type!'
+                raise UnsupportedFormElemType(\
+                    graph_field['type'].value)
 

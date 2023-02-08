@@ -1,16 +1,18 @@
 from ..Storage  import Storage, Models
-
+from typing     import Dict
 
 
 class StorageFactory():
     graph = None
-    forms = None
+    forms: Dict
 
-    def INIT(graph, forms):
+    @staticmethod
+    def INIT(graph, forms) -> None:
         StorageFactory.graph = graph
         StorageFactory.forms = forms
 
-    def Make():
+    @staticmethod
+    def Make() -> Storage:
         g = StorageFactory.graph
         user_input_model : Models.UserInput = {
             field['id']: None for field in
@@ -19,7 +21,7 @@ class StorageFactory():
         for s_id, state in g.states.items():
             branches : Models.StateBranches = list()
             for tr_id in state['transitions_ids']:
-                branch : Models.Brach = {
+                branch : Models.Branch = {
                     'req_user_input_ids' : 
                         g.transitions[tr_id]['form_elem_id'],
                     'resulting_state_id' :
