@@ -1,6 +1,5 @@
 from Graph              import Loader
-from Forms              import StorageFactory, ActiveUsersFactory
-from Backend.Factories  import FormPrototypeFactory
+from Backend.Factories  import FormPrototypeFactory, StorageFactory, ActiveUsersFactory
 from Backend.StateMachine import StateMachine, UserDone
 
 
@@ -47,7 +46,7 @@ def main():
             mapping = print_form(form)
             i = get_input_to_return(mapping)
     except UserDone:
-        for key, value in storage.storage.items():
+        for key, value in context.user_input.storage.items():
             print(forms[key]['name'], ' - ', value)
 
 def get_input_to_return(mapping):

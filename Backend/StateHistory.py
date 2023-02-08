@@ -23,7 +23,8 @@ class StateHistory():
         context.user_context.Write('state_history', hst)
 
     def DetermineNextState(context):
-        branches = context.general_info.Read['branches']
+        cur_id   = StateHistory.GetCurrent(context)
+        branches = context.general_info.Read('branches')[cur_id]
         u_input  = context.user_input
 
         for branch in branches:
@@ -31,13 +32,14 @@ class StateHistory():
                 return branch['resulting_state_id']
             for inp in branch['req_user_input_ids']:
                 print('Cond is', inp)
-                if not u_input.Contains[inp]:
+                if not u_input.Contains(inp):
                     break
                 return branch['resulting_state_id']
         return None
 
     def AtEnd(context):
-        branches = context.general_info.Read('branches')
+        cur_id   = StateHistory.GetCurrent(context)
+        branches = context.general_info.Read('branches')[cur_id]
         return len(branches) == 0
 
     def CanSwitchToNext(context):

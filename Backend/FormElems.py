@@ -40,20 +40,27 @@ class DynamicFieldFormElem(FormElem):
         self.d_id       = None
         
     def AcceptInput(self, input, context):
-        inp = ''
+        cb = None 
         if input['d_id'] is not None:
-            inp = self.__InputToOldDField(input, context)
+            cb = self.__InputToOldDField(input, context)
         else:
-            inp = self.__InputToNewDField(input)
-        super().AcceptInput(inp, context)
+            cb = self.__InputToNewDField(input, context)
+
+        if cb is None:
+            super().Reject(context)
+        else:
+            input['cb'] = cb
+            super().AcceptInput(input, context)
         
-    def ToDict(self):
-        my_repr = super().ToDict()
+    def ToDict(self, context):
+        my_repr = super().ToDict(context)
         my_repr['d_id'] = None
         ret = list()
         ret.append(my_repr)
-        d_fields = context.Read(self.storage_id).split(
-            DynamicFieldFormElem.SEPARATOR)
+        d_fields_s = context.user_input.Read(self.storage_id)
+        if d_fields_s is None: 
+            return ret
+        d_fields = d_fields_s.split(DynamicFieldFormElem.SEPARATOR)
         for cnt, d_field in enumerate(d_fields):
             ret.append( {
                 'id'        : self.id,
@@ -69,7 +76,7 @@ class DynamicFieldFormElem(FormElem):
         where.extend( self.ToDict(context) )
 
     def __InputToOldDField(self, input, context):
-        d_fields = context.Read(self.storage_id).split(
+        d_fields = context.user_input.Read(self.storage_id).split(
             DynamicFieldFormElem.SEPARATOR)
         if input['d_id'] > len(d_fields)-1:
             raise 'Dynamic field is not present!'
@@ -77,16 +84,20 @@ class DynamicFieldFormElem(FormElem):
             d_fields.pop( input['d_id'] )
         else:
             d_fields[ input['d_id'] ] = input['cb']
+        print(" OLD D_FIELDS ARE ", d_fields)
+        if len(d_fields) == 0:
+            return None
         return DynamicFieldFormElem.SEPARATOR.join(d_fields)
 
-    def __InputToNewDField(self, input):
+    def __InputToNewDField(self, input, context):
         if input['cb'] == '':
             return
-        d_fields_s = context.Read(self.storage_id) 
+        d_fields_s = context.user_input.Read(self.storage_id) 
         if d_fields_s is None:
             d_fields_s = input['cb']
         else:
             d_fields_s += DynamicFieldFormElem.SEPARATOR + input['cb']
+        print(" NEW D_FIELDS ARE ", d_fields_s)
         return d_fields_s         
 
 
