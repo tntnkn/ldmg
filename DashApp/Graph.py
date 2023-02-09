@@ -1,11 +1,11 @@
-from typing         import Dict
+from typing         import Dict, List, Union
 from .Styling       import get_node_type_class, get_edge_type_class
 
 
 class CytoGraph():
     def __init__(self, graph):
         self.start_node_id : Union[str, None] = graph.start_node_id
-        self.end_node_id   : Union[str, None] = graph.end_node_id
+        self.end_node_ids  : List[str]        = graph.end_node_ids
         self.always_open_ids : List[str] = graph.always_open_ids 
 
         self.impl = {

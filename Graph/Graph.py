@@ -1,4 +1,4 @@
-from typing      import Union, Dict
+from typing      import Union, Dict, List
 from .State      import State, StateType 
 from .Transition import Transition
 from .Form       import Form 
@@ -9,7 +9,7 @@ from .Types      import ID_TYPE
 class Graph():
     def __init__(self):
         self.start_node_id : Union[ID_TYPE, None] = None
-        self.end_node_id   : Union[ID_TYPE, None] = None
+        self.end_node_ids  : List[ID_TYPE]        = list()
         self.always_open_ids : List[ID_TYPE]      = list()
 
         self.states      : Dict[ID_TYPE, State]      = dict()
@@ -21,15 +21,18 @@ class Graph():
 
         if state['type'] == StateType.START and self.start_node_id:
             raise StartNodeAlreadyExists(state) 
+        """ 
         if state['type'] == StateType.END   and self.end_node_id:
             raise EndNodeAlreadyExists(state) 
+        """ 
 
         self.states[state['id']] = state
 
         if    state['type'] == StateType.START:
             self.start_node_id = state['id'] 
         elif  state['type'] == StateType.END:
-            self.end_node_id   = state['id'] 
+            #self.end_node_id   = state['id'] 
+            self.end_node_ids.append(state['id'])
         elif  state['type'] == StateType.ALWAYS_OPEN:
             self.always_open_ids.append(state['id'])
 
