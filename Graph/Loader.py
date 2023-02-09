@@ -2,42 +2,12 @@ from pyairtable  import Table
 from typing      import Dict, Tuple
 from .           import Config
 from .State      import State, StateType
-from .Transition import Transition, TransitionType, OperatorType, get_always_reachable_transition
+from .Transition import Transition, TransitionType 
 from .Form       import Form, FormType
 from .Types      import ID_TYPE
 from .Graph      import Graph
-
-
-class StateFieldsConsts():
-    NAME                = 'Название'
-    FORMS               = 'Форма'
-    FORCE_COMPLETION    = 'Обязательно закончить'
-    IS_START            = 'Начало'
-    IS_END              = 'Конец'
-    IS_ALWAYS_REACHABLE = 'Всегда доступно'
-    PIN_WIDGET          = 'Закрепить виджет'
-    BEFORE_ENTER        = 'Перед входом'
-    BEFORE_LEAVE        = 'Перед уходом'
-
-
-class TransitionFieldConsts():
-    NAME                = 'Название'
-    SOURCE              = 'Откуда'
-    TARGET              = 'Куда'
-    LEFT_COMP_OPER      = 'Эллемент формы'
-    OPERATOR            = 'Оператор'
-    RIGHT_COMP_OPER     = 'Значение'
-
-
-class OperatorTypeFieldConst():
-    NONE        = 'Отсутствует'
-    EQUALS      = 'Равно'
-
-
-class FormFieldConsts():
-    NAME                = 'Название'
-    TYPE                = 'Тип'
-    VALUE               = 'Значение'
+from .Exceptions import UnknownFormType, TableIsEmpty
+from .Models     import StateFieldsConsts, TransitionFieldConsts, FormFieldConsts
 
 
 class Loader():
@@ -58,21 +28,21 @@ class Loader():
                                 config.AIRTABLE_STATES_TABLE_ID)
         self.states_records = states_table.all() 
         if len(self.states_records) == 0:
-            raise "States table is empty!"
+            raise TableIsEmpty('States')
 
         transitions_table   = Table(config.AIRTABLE_API_KEY, 
                                 config.AIRTABLE_BASE_ID,
                                 config.AIRTABLE_TRANSITIONS_TABLE_ID)
         self.transitions_records = transitions_table.all() 
         if len(self.transitions_records) == 0:
-            raise "Transitions table is empty!"
+            raise TableIsEmpty('Transitions')
 
         forms_table         = Table(config.AIRTABLE_API_KEY, 
                                 config.AIRTABLE_BASE_ID,
                                 config.AIRTABLE_FORMS_TABLE_ID)
         self.forms_records  = forms_table.all() 
         if len(self.forms_records) == 0:
-            raise "Forms table is empty!"
+            raise TableIsEmpty('Forms')
 
     
     def load_graph(self):
@@ -85,57 +55,35 @@ class Loader():
         self.process_transitions_records()
         self.process_forms_records()
 
-        '''for state in self.graph.states.values():
-            for reach_node_id in self.graph.always_reachable_nodes_ids:
-                tr = get_always_reachable_transition(
-                    state['id']+reach_node_id, 
-                    state['id'],
-                    reach_node_id)
-                self.graph.AddTransition(tr)'''
 
     def process_states_records(self):
         for record in self.states_records:
             fields = record['fields']
             state : State = {
-                'id' : record['id'],
-                'name': fields.get(
-                        StateFieldsConsts.NAME, 
-                        'NO NAME PROVIDED!'),
-                'type': StateType.UNKNOWN,
-                'force_completion' : fields.get(
-                        StateFieldsConsts.FORCE_COMPLETION, 
-                        False),
+                'id'        : record['id'],
+                'name'      : fields.get(
+                        StateFieldsConsts.NAME, 'NO NAME'),
+                'type'      : StateType.UNKNOWN,
+                'is_start'  : False,
+                'is_end'    : False,
                 'forms_ids' : [
                     a_id for a_id in fields.get( 
-                        StateFieldsConsts.FORMS, 
-                        list() )],
-                'transitions_ids' : list(),
-                'is_start' : fields.get(
-                        StateFieldsConsts.IS_START, 
-                        False),
-                'is_end' : fields.get(
-                        StateFieldsConsts.IS_END, 
-                        False),
-                'is_always_reachable' : fields.get(
-                        StateFieldsConsts.IS_ALWAYS_REACHABLE, 
-                        False),
-                'pin_widget' : fields.get(
-                        StateFieldsConsts.PIN_WIDGET, 
-                        False),
-                'before_enter' : fields.get(
-                        StateFieldsConsts.BEFORE_ENTER, 
-                        False),
-                'before_leave': fields.get(
-                        StateFieldsConsts.BEFORE_LEAVE, 
-                        False),
+                        StateFieldsConsts.FORMS, list() )],
+                'in_transitions_ids' : [
+                    a_id for a_id in fields.get( 
+                        StateFieldsConsts.IN_TRANSITIONS, list() )],
+                'out_transitions_ids' : [
+                    a_id for a_id in fields.get( 
+                        StateFieldsConsts.OUT_TRANSITIONS, list() )],
             }
 
-            if   state['is_start']:
+            if   len(state['in_transitions_ids'])  == 0 and\
+                 len(state['out_transitions_ids']) == 0:
+                state['type'] = StateType.ALWAYS_OPEN
+            elif len(state['in_transitions_ids'])  == 0:
                 state['type'] = StateType.START
-            elif  state['is_end']:
+            elif len(state['out_transitions_ids']) == 0:
                 state['type'] = StateType.END
-            elif state['is_always_reachable']:
-                state['type'] = StateType.ALWAYS_REACHABLE
             else:
                 state['type'] = StateType.REGULAR
             
@@ -148,35 +96,26 @@ class Loader():
         for record in self.transitions_records:
             fields = record['fields']
 
-            cond_operator =fields.get(TransitionFieldConsts.OPERATOR, '')
-            match cond_operator:
-                case OperatorTypeFieldConst.EQUALS:
-                    cond_operator = OperatorType.EQUALS
-                case _:
-                    cond_operator = OperatorType.NONE
-
             transition : Transition = {
                     'id' : record['id'],
                     'name' : fields.get(
-                        TransitionFieldConsts.NAME, None),
+                        TransitionFieldConsts.NAME, 'NO NAME'),
                     'type': TransitionType.UNKNOWN,
                     'source_id' : fields.get(
                         TransitionFieldConsts.SOURCE, None)[0],
                     'target_id' : fields.get(
                         TransitionFieldConsts.TARGET, None)[0],
-                    'form_elem_id' : fields.get(
-                        TransitionFieldConsts.LEFT_COMP_OPER, list()),
-                    'cond_operator' : cond_operator,
-                    'cond_value' : fields.get(
-                        TransitionFieldConsts.RIGHT_COMP_OPER, None),
+                    'form_elem_ids' : fields.get(
+                        TransitionFieldConsts.FORM_CONDITIONS, list()),
             }
-            if transition['form_elem_id']:
-                transition['type'] = TransitionType.CONDITIONAL
-            else:
+            if len(transition['form_elem_ids']) == 0:
                 transition['type'] = TransitionType.UNCONDITIONAL
+            else:
+                transition['type'] = TransitionType.CONDITIONAL
 
             self.graph.AddTransition(transition)
         return self.graph.transitions
+
 
     def process_forms_records(self):
         for record in self.forms_records:
@@ -184,10 +123,8 @@ class Loader():
             form : Form = {
                 'id'    : record['id'],
                 'name'  : fields.get(
-                    FormFieldConsts.NAME, None),
+                    FormFieldConsts.NAME, 'NO NAME'),
                 'type'  : FormType.UNKNOWN,
-                'value' : fields.get(
-                    FormFieldConsts.VALUE, None),
             }
 
             t = record['fields'].get(FormFieldConsts.TYPE, None)
@@ -196,7 +133,7 @@ class Loader():
                     form['type'] = ft
                     break
             if form['type'] == FormType.UNKNOWN:
-                raise "Form type unknown!"
+                raise UnknownFormType(form['name'])
 
             self.forms[form['id']] = form
 

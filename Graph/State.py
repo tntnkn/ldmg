@@ -1,30 +1,27 @@
-from enum       import Enum, unique
 from typing     import TypedDict, List, Dict, Union
+from enum       import Enum, unique
 
 from .Types     import ID_TYPE
+
 
 @unique
 class StateType(Enum):
     UNKNOWN             = 'UNKNOWN' 
     START               = 'START'
     END                 = 'END'
-    ALWAYS_REACHABLE    = 'ALWAYS_REACHABLE'
     REGULAR             = 'REGULAR'
+    ALWAYS_OPEN         = 'ALWAYS_OPEN'
 
 
 class State(TypedDict):
     id                              : ID_TYPE
     name                            : str
     type                            : StateType
-    force_completion                : bool
-    forms_ids                       : List[ID_TYPE]
-    transitions_ids                 : List[ID_TYPE]
     is_start                        : bool
     is_end                          : bool
-    is_always_reachable             : bool
-    pin_widget                      : bool
-    before_enter                    : List[str]
-    before_leave                    : List[str]
+    forms_ids                       : List[ID_TYPE]
+    in_transitions_ids              : List[ID_TYPE]
+    out_transitions_ids             : List[ID_TYPE]
 
 
 def get_dummy_state() -> State:
@@ -32,15 +29,11 @@ def get_dummy_state() -> State:
         'id'                    : '',
         'name'                  : 'dummy',
         'type'                  : StateType.UNKNOWN,
-        'force_completion'      : True,
-        'forms_ids'             : list(),
-        'transitions_ids'       : list(),
-        'is_always_reachable'   : False,
         'is_start'              : False,
         'is_end'                : False,
-        'pin_widget'            : False,
-        'before_leave'          : list(),
-        'before_enter'          : list()
+        'forms_ids'             : list(),
+        'in_transitions_ids'    : list(),
+        'out_transitions_ids'   : list(),
     }
 
 

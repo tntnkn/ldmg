@@ -1,5 +1,5 @@
-from enum       import Enum, auto, unique
 from typing     import TypedDict, List, Dict, Union
+from enum       import Enum, unique
 
 from .Types     import ID_TYPE
 
@@ -13,16 +13,12 @@ class FormType(Enum):
     BUTTON          = 'Кнопка действия'
     SINGLE_CHOICE   = 'Кнопка единичного выбора'
     MULTI_CHOICE    = 'Кнопка множественного выбора'
-    DOCUMENT        = 'Документ'
-    DEFAULT         = 'По умолчанию' 
-    ALWAYS_REACHABLE= 'Всегда доступно'
 
 
 class Form(TypedDict, total=True):
     id              : ID_TYPE
     name            : str
     type            : FormType
-    value           : Union[str, None]
 
 
 def get_dummy_form() -> Form:
@@ -30,7 +26,6 @@ def get_dummy_form() -> Form:
         'id'            : '0',
         'name'          : 'dummy',
         'type'          : FormType.UNKNOWN,
-        'value'         : None,
     }
 
 if __name__ == '__main__':
