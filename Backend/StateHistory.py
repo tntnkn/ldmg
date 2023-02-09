@@ -46,8 +46,10 @@ class StateHistory():
     @staticmethod
     def AtEnd(context: Context) -> bool:
         cur_id   = StateHistory.GetCurrent(context)
-        branches = context.general_info.Read('branches')[cur_id]
-        return len(branches) == 0
+        end_ids  = context.general_info.Read('end_ids')
+        return cur_id in end_ids
+        #branches = context.general_info.Read('branches')[cur_id]
+        #return len(branches) == 0
 
     @staticmethod
     def CanSwitchToNext(context: Context) -> bool:
