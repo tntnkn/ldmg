@@ -9,7 +9,7 @@ def get_node_type_class(node_type : str) -> str:
             return 'start_node '
         case NodeType.END.value:
             return 'end_node '
-        case NodeType.ALWAYS_REACHABLE.value:
+        case NodeType.ALWAYS_OPEN.value:
             return 'always_reachable_node '
         case NodeType.REGULAR.value:
             return 'regular_node '

@@ -4,9 +4,9 @@ from .Styling       import get_node_type_class, get_edge_type_class
 
 class CytoGraph():
     def __init__(self, graph):
-        self.start_node_id : Union[int, None] = None
-        self.end_node_id   : Union[int, None] = None
-        self.always_reachable_nodes_ids : List[int] = list()
+        self.start_node_id : Union[str, None] = graph.start_node_id
+        self.end_node_id   : Union[str, None] = graph.end_node_id
+        self.always_open_ids : List[str] = graph.always_open_ids 
 
         self.impl = {
             'data'      : list(),

@@ -6,8 +6,8 @@ class NodeType(Enum):
     UNKNOWN             = 'UNKNOWN' 
     START               = 'START'
     END                 = 'END'
-    ALWAYS_REACHABLE    = 'ALWAYS_REACHABLE'
     REGULAR             = 'REGULAR'
+    ALWAYS_OPEN         = 'ALWAYS_OPEN'
     
 
 @unique

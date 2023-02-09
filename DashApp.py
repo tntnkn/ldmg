@@ -18,7 +18,6 @@ cgraph = CytoGraph(loader.graph)
 
 def main():
     global cgraph
-    global loader
 
     print('\n')
     for node in cgraph.impl['elements']['nodes']:
@@ -31,9 +30,10 @@ def main():
 
 
     roots = ''
-    for n_id in graph.always_reachable_nodes_ids:
+    for n_id in cgraph.always_open_ids:
         roots += f"#{n_id}," 
-    roots = roots[0:-1]
+    roots += f"#{cgraph.start_node_id}"
+    print(roots)
     
     cytograph.elements=cgraph.impl['elements']
     cytograph.layout['roots'] = roots
