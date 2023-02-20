@@ -24,7 +24,8 @@ class StateHistory():
         if len(hst)-1 > idx and hst[idx+1]==next_id:
             return
         hst=hst[0:idx+1]
-        hst.append(next_id)
+        if next_id:
+            hst.append(next_id)
         context.user_context.Write('state_history', hst)
 
     @staticmethod
