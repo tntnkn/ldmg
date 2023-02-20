@@ -14,8 +14,12 @@ class Config():
                 os.getenv('AIRTABLE_FORMS_TABLE_ID')
         self.AIRTABLE_TRANSITIONS_TABLE_ID  = \
                 os.getenv('AIRTABLE_TRANSITIONS_TABLE_ID')
+        self.AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID = \
+                os.getenv('AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID')
+
 
 config = Config()
 
 def get() -> Config:
     return config
+

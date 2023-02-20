@@ -15,4 +15,5 @@ class TransitionFieldConsts():
 class FormFieldConsts():
     NAME                = 'Название'
     TYPE                = 'Тип'
+    STATE_ID            = 'Состояние'
 

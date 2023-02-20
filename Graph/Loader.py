@@ -39,8 +39,10 @@ class Loader():
 
         forms_table         = Table(config.AIRTABLE_API_KEY, 
                                 config.AIRTABLE_BASE_ID,
-                                config.AIRTABLE_FORMS_TABLE_ID)
-        self.forms_records  = forms_table.all() 
+                                config.AIRTABLE_FORMS_TABLE_ID,
+                                )
+        self.forms_records  = forms_table.all(
+            view=config.AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID)
         if len(self.forms_records) == 0:
             raise TableIsEmpty('Forms')
 
@@ -51,9 +53,11 @@ class Loader():
            len(self.forms_records) == 0:
                self.load_tables()
 
-        self.process_states_records()
-        self.process_transitions_records()
-        self.process_forms_records()
+        s = self.process_states_records()
+        t = self.process_transitions_records()
+        f = self.process_forms_records()
+
+        self.connect_states_with_forms(s, f)
 
 
     def process_states_records(self):
@@ -66,9 +70,7 @@ class Loader():
                 'type'      : StateType.UNKNOWN,
                 'is_start'  : False,
                 'is_end'    : False,
-                'forms_ids' : [
-                    a_id for a_id in fields.get( 
-                        StateFieldsConsts.FORMS, list() )],
+                'forms_ids' : list(), 
                 'in_transitions_ids' : [
                     a_id for a_id in fields.get( 
                         StateFieldsConsts.IN_TRANSITIONS, list() )],
@@ -88,7 +90,7 @@ class Loader():
                 state['type'] = StateType.REGULAR
             
             self.graph.AddState(state)
-        return self.graph.transitions
+        return self.graph.states
 
 
     def process_transitions_records(self):
@@ -121,10 +123,12 @@ class Loader():
         for record in self.forms_records:
             fields = record['fields']
             form : Form = {
-                'id'    : record['id'],
-                'name'  : fields.get(
+                'id'        : record['id'],
+                'name'      : fields.get(
                     FormFieldConsts.NAME, 'NO NAME'),
-                'type'  : FormType.UNKNOWN,
+                'type'      : FormType.UNKNOWN,
+                'state_id'  : fields.get(
+                    FormFieldConsts.STATE_ID, None),
             }
 
             t = record['fields'].get(FormFieldConsts.TYPE, None)
@@ -135,8 +139,28 @@ class Loader():
             if form['type'] == FormType.UNKNOWN:
                 raise UnknownFormType(form['name'])
 
-            self.forms[form['id']] = form
+            if len(form['state_id']) == 1:
+                form['state_id'] = form['state_id'][0]
+            else:
+                form['state_id'] = None
 
+            self.forms[form['id']] = form
+        return self.forms
+
+
+    def connect_states_with_forms(self, states: Dict, forms: Dict):
+        for form in forms.values():
+            state = states.get(form['state_id'], None)
+            if state:
+                state['forms_ids'].append(form['id'])
+
+
+def load_forms():
+    l = Loader()
+    l.load_tables()
+    forms = l.process_forms_records()
+    for form in forms.values():
+        print(form['name'], form['type'])
 
 
 if __name__ == '__main__':

@@ -19,6 +19,7 @@ class Form(TypedDict, total=True):
     id              : ID_TYPE
     name            : str
     type            : FormType
+    state_id        : ID_TYPE
 
 
 def get_dummy_form() -> Form:
@@ -26,6 +27,7 @@ def get_dummy_form() -> Form:
         'id'            : '0',
         'name'          : 'dummy',
         'type'          : FormType.UNKNOWN,
+        'state_id'      : '0',
     }
 
 if __name__ == '__main__':
