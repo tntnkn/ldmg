@@ -16,7 +16,7 @@ class ActiveUsers(StorageInterface):
         self.storage.AssertUser(user_id)
 
     def AddUser(self, user_id: M.ID) -> None: 
-        self.storage.AddUser(user_id)
+        return self.storage.AddUser(user_id)
 
     def GetUserContext(self, user_id: M.ID) -> Context: 
         if user_id not in self.user_context_cache:

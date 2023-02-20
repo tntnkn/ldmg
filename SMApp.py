@@ -1,53 +1,40 @@
 from Graph              import Loader
-from Backend.Factories  import FormPrototypeFactory, StorageFactory, ActiveUsersFactory
-from Backend.StateMachine import StateMachine, UserDone
+from Backend.Factories  import Assembly
 
 
 def main():
+
     print("Loading graph")
     loader = Loader()
     loader.load_graph()
-    graph = loader.graph
-    forms = loader.forms
-    print("Building forms factory")
-    
-    FormPrototypeFactory.INIT(graph.states, forms)
 
-    print('\nForms are:')
-    for form in FormPrototypeFactory.prototypes.values():
-        print('- ', graph.states[form.id]['name'], form.fields, '\n')
+    Assembly.Assemble(loader)
+    back_api = Assembly.api 
 
-    print('\nTesting prototype factory:')
-    for form in FormPrototypeFactory.prototypes.values():
-        copy = FormPrototypeFactory.Make(form.id)
-        print('- ', form.id, copy.id)
-    for form in FormPrototypeFactory.prototypes.values():
-        copy = FormPrototypeFactory.Make(form.id)
-        copy.id = 'LALALA'
-        print('- ', form.id, copy.id)
+    user_id = back_api.NewUser()
+    message = {
+        'user_id'   : user_id,
+        'type'      : 'input',
+        'contents'  : None,
+    }
 
-    StorageFactory.INIT(graph, forms)
-    storage = StorageFactory.Make()
-    ActiveUsersFactory.INIT(storage)
-    active_users = ActiveUsersFactory.Make()
-
-    user_id = 0
-    active_users.AddUser(user_id)
-    context = active_users.GetUserContext(user_id)
-
-    SM = StateMachine()    
-    i = None
-    try:
-        while True:
-            form = SM.Go(context, i)
+    while True:
+        reply = back_api.AcceptInput(message)
+        if   reply['type'] == 'form':
+            form  = reply['contents']
             print('Form is', form)
             for f in form:
                 print(f)
             mapping = print_form(form)
-            i = get_input_to_return(mapping)
-    except UserDone:
-        for key, value in context.user_input.storage.items():
-            print(forms[key]['name'], ' - ', value)
+            message['contents'] = get_input_to_return(mapping)
+        elif reply['type'] == 'pos_end':
+            for key, value in reply['contents']:
+                print(loader.forms[key]['name'], ' - ', value)
+            print('WE ARE DONE!')
+            break
+        else:
+            raise RuntimeError('UNKNOWN MESSAGE TYPE')
+
 
 def get_input_to_return(mapping):
     i = input('Gimme input: ')
@@ -63,15 +50,15 @@ def get_input_to_return(mapping):
 
     f = mapping[idx]
     ret =  {
-            'type'          : f['type'],
-            'session_id'    : None,
+            'field_type'    : f['type'],
             'field_id'      : f['id'],
             'cb'            : f['cb'],
     }
 
-    if ret['type'] == 'FORM':
+    if ret['field_type'] == 'FORM':
         ret['cb'] = input('Gimme smth to write to a form: ')
-    elif ret['type'] == 'D_FORM' or ret['type'] == 'D_FORM_CHIEF':
+    elif ret['field_type'] == 'D_FORM' or\
+         ret['field_type'] == 'D_FORM_CHIEF':
         ret['cb'] = input('Gimme smth to write to a form: ')
         ret['d_id'] = f['d_id']
 

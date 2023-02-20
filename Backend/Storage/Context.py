@@ -8,6 +8,9 @@ class StorageView():
     def Read(self, key):
         return self.storage[key]
 
+    def ReadAll(self):
+        raise OperationIsNotSupported('ReadAll') 
+
     def Write(self, key, value):
         self.storage[key] = value
 
@@ -20,9 +23,13 @@ class StorageView():
     def TransactionGo(self):
         pass
 
+
 class UserInputStorage(StorageView):
     def __init__(self, user_storage ):
         super().__init__(user_storage)
+
+    def ReadAll(self):
+        return self.storage.items()
 
 
 class UserContextStorage(StorageView):

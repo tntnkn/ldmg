@@ -1,5 +1,6 @@
 from .StateHistory  import StateHistory
 from .Factories     import FormPrototypeFactory
+from .Exceptions    import UserDone
 
 
 class StateMachine():
@@ -26,8 +27,4 @@ class StateMachine():
             cur_id = StateHistory.GetCurrent(context)
             form = FormPrototypeFactory.Get(cur_id)
             form.AcceptInput(input, context)
-
-
-class UserDone(Exception):
-    pass
 

@@ -102,3 +102,8 @@ class FormElemSwitchedHistory(Exception):
     def __reduce__(self):
         return (FormElemSwitchedHistory, (self.message, self.name))
 
+
+# ==== Messaging Exceptions
+class UserDone(Exception):
+    pass
+

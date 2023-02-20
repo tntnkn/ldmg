@@ -1,4 +1,5 @@
-from enum       import Enum, auto, unique
+from enum        import Enum, auto, unique
+from dataclasses import dataclass
 
 
 class FormType():
@@ -12,4 +13,12 @@ class FormType():
     DOCUMENT        = 'Документ'
     DEFAULT         = 'По умолчанию' 
     ALWAYS_REACHABLE= 'Всегда доступно'
+
+
+@dataclass
+class UserInput():
+    type         : str 
+    user_id      : str 
+    form_elem_id : str 
+    cb           : str
 
