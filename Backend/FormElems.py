@@ -113,6 +113,8 @@ class ButtonFormElem(FormElem):
         self.type: str = 'BUTTON'
 
     def AcceptInput(self, input, context: Context) -> None:
+        for groupee in self.group:
+            groupee.Reject(context)
         super().AcceptInput(input, context)
         next_id = self.FormElemToNext(context)
         StateHistory.SetNext(next_id, context)
@@ -128,7 +130,6 @@ class SingleChoiceFormElem(FormElem):
     def AcceptInput(self, input, context: Context) -> None:
         if self.IsCompleted(context):
             return self.Reject(context)
-        print("GROUP IS", self.group)
         for groupee in self.group:
             groupee.Reject(context)
         return super().AcceptInput(input, context)
