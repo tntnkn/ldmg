@@ -38,7 +38,6 @@ class StateHistory():
             if len(branch['req_user_input_ids']) == 0:
                 return branch['resulting_state_id']
             for inp in branch['req_user_input_ids']:
-                print('Cond is', inp)
                 if not u_input.Contains(inp):
                     break
                 return branch['resulting_state_id']

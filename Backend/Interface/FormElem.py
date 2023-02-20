@@ -18,17 +18,21 @@ class FormElem():
         self.group: List[FormElem] = group
         self.group.append(self)
 
+        self.is_completed = False
+
         self.type: str = 'INTERFACE'
 
     def AcceptInput(self, input, context: Context) -> None:
         context.user_input.Write(self.storage_id, input['cb'])
+        self.is_completed = True
 
     def Reject(self, context: Context) -> None:
         context.user_input.Delete(self.storage_id)
+        self.is_completed = False
 
     def IsCompleted(self, context: Context) -> bool:
-        return True if context.user_input.Contains(self.storage_id)\
-            else False
+        return self.is_completed
+        #return True if context.user_input.Contains(self.storage_id) else False
 
     def ToDict(self, context: Context) -> Dict:
         return {
@@ -37,7 +41,6 @@ class FormElem():
             'cb'        : self.cb,
             'text'      : self.text,
             'completed' : self.IsCompleted(context),
-
         }
 
     def ToJson(self, context: Context) -> str:

@@ -10,10 +10,9 @@ class FormElemFactory():
     current_group: List[FormElem] = list()
 
     def Make(graph_field) -> FormElem:
-        if graph_field['type'].value!=FormElemFactory.prev_field_type:
-            FormElemFactory.prev_field_type = graph_field['type']    
+        if graph_field['type']!=FormElemFactory.prev_field_type:
+            FormElemFactory.prev_field_type = graph_field['type']
             FormElemFactory.current_group   = list()
-
         g = FormElemFactory.current_group
         match graph_field['type'].value:
             case FormType.REGULAR_TEXT:

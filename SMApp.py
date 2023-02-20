@@ -22,9 +22,11 @@ def main():
         reply = back_api.AcceptInput(message)
         if   reply['type'] == 'form':
             form  = reply['contents']
+            """
             print('Form is', form)
             for f in form:
                 print(f)
+            """
             mapping = print_form(form)
             message['contents'] = get_input_to_return(mapping)
         elif reply['type'] == 'pos_end':
@@ -70,7 +72,7 @@ def print_form(form):
     mapping = list()
     cnt = 0
     for field in form:
-        print(cnt, field['text'], field['type'], field['cb'])
+        print(cnt, field['completed'], field['text'], field['type'], field['cb'])
         mapping.append(field)
         cnt += 1
     return mapping

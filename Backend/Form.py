@@ -22,18 +22,21 @@ class Form():
             'type'      : 'BUTTON',
             'cb'        : 'next',
             'text'      : 'ДАЛЕЕ',
+            'completed' : False,
         }
         self.prev_b_tpl     = {
             'id'        : 'prev',
             'type'      : 'BUTTON',
             'cb'        : 'prev',
             'text'      : 'НАЗАД',
+            'completed' : False,
         }
         self.done_b_tpl     = {
             'id'        : 'done',
             'type'      : 'BUTTON',
             'cb'        : 'done',
             'text'      : 'ВСЁ',
+            'completed' : False,
         }
 
     def IsCompleted(self, context: Context) -> bool:

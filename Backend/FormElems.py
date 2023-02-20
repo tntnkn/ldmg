@@ -127,7 +127,8 @@ class SingleChoiceFormElem(FormElem):
 
     def AcceptInput(self, input, context: Context) -> None:
         if self.IsCompleted(context):
-            self.Reject(context)
+            return self.Reject(context)
+        print("GROUP IS", self.group)
         for groupee in self.group:
             groupee.Reject(context)
         return super().AcceptInput(input, context)
@@ -140,6 +141,6 @@ class MultiChoiceFormElem(FormElem):
 
     def AcceptInput(self, input, context: Context) -> None:
         if self.IsCompleted(context):
-            self.Reject(context)
+            return self.Reject(context)
         return super().AcceptInput(input, context)
 
