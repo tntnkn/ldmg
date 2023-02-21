@@ -44,7 +44,7 @@ class DynamicFieldFormElem(FormElem):
 
     def __init__(self, field, group: List[FormElem]):
         super().__init__(field, group)
-        self.type: str               = 'D_FORM_CHIEF'
+        self.type: str               = 'D_FORM'
         self.d_id: Union[M.ID, None] = None
         
     def AcceptInput(self, input, context: Context) -> None:
