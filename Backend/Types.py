@@ -15,10 +15,12 @@ class FormType():
     ALWAYS_REACHABLE= 'Всегда доступно'
 
 
-@dataclass
-class UserInput():
-    type         : str 
-    user_id      : str 
-    form_elem_id : str 
-    cb           : str
+class FormElemsTypes():
+    text            = 'TEXT'
+    form            = 'FORM'
+    d_form_chief    = 'D_FORM_CHIEF'
+    d_form          = 'D_FORM'
+    button          = 'BUTTON'
+    s_choice        = 'S_CHOICE'
+    m_choice        = 'M_CHOICE'
 

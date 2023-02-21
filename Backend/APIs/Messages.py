@@ -2,7 +2,18 @@ from ..Storage  import Models as M
 from typing     import TypedDict, Dict, Union
 
 
-Form = Dict
+class MessageType():
+    Input       = 'input'
+    FormOut     = 'form'
+    PositiveEnd = 'pos_end'
+
+
+class Form(TypedDict):
+    id        : M.ID
+    type      : MessageType
+    cb        : str 
+    text      : str
+    completed : bool
 
 
 class Input(TypedDict):
@@ -19,10 +30,4 @@ class Message(TypedDict):
     user_id     : M.ID 
     type        : str
     contents    : Union[Input, Output, None]
-
-
-class MessageType():
-    Input       = 'input'
-    FormOut     = 'form'
-    PositiveEnd = 'pos_end'
 

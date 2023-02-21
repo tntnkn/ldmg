@@ -1,4 +1,3 @@
-from .Types     import UserInput
 from .Factories import APIFactory
 
 
@@ -9,7 +8,7 @@ class API():
     def NewUser(self):
         pass
 
-    def AcceptInput(self, input: UserInput):
+    def AcceptInput(self, input):
         pass
 
 
