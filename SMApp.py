@@ -30,7 +30,7 @@ def main():
             mapping = print_form(form)
             message['contents'] = get_input_to_return(mapping)
         elif reply['type'] == 'pos_end':
-            for key, value in reply['contents']:
+            for key, value in reply['contents'].items():
                 print(loader.forms[key]['name'], ' - ', value)
             print('WE ARE DONE!')
             break

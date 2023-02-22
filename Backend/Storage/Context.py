@@ -29,7 +29,7 @@ class UserInputStorage(StorageView):
         super().__init__(user_storage)
 
     def ReadAll(self):
-        return self.storage.items()
+        return self.storage
 
 
 class UserContextStorage(StorageView):
