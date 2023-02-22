@@ -40,7 +40,8 @@ class RegularFieldFormElem(FormElem):
 
 
 class DynamicFieldFormElem(FormElem):
-    SEPARATOR = ', '
+    SEPARATOR       = ', '
+    ADD_BUT_D_ID    = '' 
 
     def __init__(self, field, group: List[FormElem]):
         super().__init__(field, group)
@@ -49,7 +50,7 @@ class DynamicFieldFormElem(FormElem):
         
     def AcceptInput(self, input, context: Context) -> None:
         cb = None 
-        if input['d_id'] is not None:
+        if input['d_id'] is not DynamicFieldFormElem.ADD_BUT_D_ID:
             cb = self.__InputToOldDField(input, context)
         else:
             cb = self.__InputToNewDField(input, context)
@@ -62,7 +63,7 @@ class DynamicFieldFormElem(FormElem):
         
     def ToDict(self, context: Context) -> List[Dict]:
         my_repr = super().ToDict(context)
-        my_repr['d_id'] = None
+        my_repr['d_id'] = DynamicFieldFormElem.ADD_BUT_D_ID 
         ret: List[Dict] = list()
         ret.append(my_repr)
         d_fields_s = context.user_input.Read(self.storage_id)
@@ -72,7 +73,7 @@ class DynamicFieldFormElem(FormElem):
         for cnt, d_field in enumerate(d_fields):
             ret.append( {
                 'id'        : self.id,
-                'd_id'      : cnt,
+                'd_id'      : str(cnt),
                 'type'      : 'D_FORM',
                 'cb'        : self.cb,
                 'text'      : d_field,
@@ -86,12 +87,13 @@ class DynamicFieldFormElem(FormElem):
     def __InputToOldDField(self, input, context: Context) -> str:
         d_fields = context.user_input.Read(self.storage_id).split(
             DynamicFieldFormElem.SEPARATOR)
-        if input['d_id'] > len(d_fields)-1:
+        d_id = int(input['d_id'])
+        if d_id > len(d_fields)-1:
             raise WrongDynamicField(self.id)
         if input['cb'] == '':
-            d_fields.pop( input['d_id'] )
+            d_fields.pop(d_id)
         else:
-            d_fields[ input['d_id'] ] = input['cb']
+            d_fields[d_id] = input['cb']
         return DynamicFieldFormElem.SEPARATOR.join(d_fields).strip()
 
     def __InputToNewDField(self, input, context: Context) -> str:
