@@ -1,11 +1,42 @@
 from ..Factories    import BackAPIFactory, FormFactory
 from ..Storage      import UserStorageView
-from ..Utils        import CallbackTransformer, AllowedInputTypeHelper, Send, MessagesArchive
+from ..Utils        import CallbackTransformer, AllowedInputTypeHelper, Send, MessagesArchive, MessageManager
 from ..Static       import AllowedInputType
 from ..bot          import dp, types
 
 
 back_api = BackAPIFactory.Make()
+
+
+async def handle_old_form(s_view):
+    old_form = s_view.Read('displayed_form')
+    if old_form:
+        await old_form.Hide()
+
+async def handle_back_request(contents, s_view):
+    user_id = s_view.Read('back_id')
+    tg_user_id = s_view.GetUserId()
+
+    req = {
+        'user_id'   : user_id,
+        'type'      : 'input',
+        'contents'  : contents,
+    }
+    resp = back_api.AcceptInput(req)
+
+    if resp['type'] == 'pos_end':
+        text = ''
+        for key, value in resp['contents'].items():
+            text += f"{key} -- {value}\n"
+        await MessageManager.SendText(text, tg_user_id) 
+        await MessagesArchive.Clear(tg_user_id)
+        s_view.Destroy()
+        return
+
+    form = FormFactory.Make(resp['contents'], tg_user_id)
+
+    await form.Display()
+    s_view.Write('displayed_form', form)
 
 
 # --- Commands Handlers
@@ -23,20 +54,8 @@ async def startCommandHandler(message: types.Message):
             AllowedInputType.CB, allowed)
     s_view.Write('allowed_input_types', allowed)
 
-    req = {
-        'user_id'   : user_id,
-        'type'      : 'input',
-        'contents'  : None,
-    }
-
-    old_form = s_view.Read('displayed_form')
-    if old_form:
-        await old_form.Hide()
-    resp = back_api.AcceptInput(req)
-    form = FormFactory.Make(resp['contents'], message.from_id)
-    await form.Display()
-    s_view.Write('displayed_form', form)
-
+    await handle_old_form(s_view)
+    await handle_back_request(None, s_view)
 
 
 # --- Text input handlers
@@ -61,8 +80,9 @@ async def generalTextMessageHandler(message: types.Message):
 
     field_type, field_id, _, d_id = CallbackTransformer.Split(
         s_view.Read('compressed_back_data'))
-    user_id = s_view.Read('back_id')
-    print("MESSAGE TEXT IS", message.text)
+
+    await handle_old_form(s_view)
+
     contents = {
         'field_type'  : field_type,
         'field_id'    : field_id,
@@ -70,19 +90,7 @@ async def generalTextMessageHandler(message: types.Message):
         'd_id'        : d_id,
     }
 
-    req = {
-        'user_id'   : user_id,
-        'type'      : 'input',
-        'contents'  : contents,
-    }
-
-    old_form = s_view.Read('displayed_form')
-    if old_form:
-        await old_form.Hide()
-    resp = back_api.AcceptInput(req)
-    form = FormFactory.Make(resp['contents'], tg_user_id)
-    await form.Display()
-    s_view.Write('displayed_form', form)
+    await handle_back_request(contents, s_view)
 
 
 # --- Callback Query Handlers
@@ -119,23 +127,13 @@ async def generalCallbackQueryHandler(callback: types.CallbackQuery):
         
     user_id = s_view.Read('back_id')
 
+    await handle_old_form(s_view)
+
     contents = {
         'field_type'  : field_type,
         'field_id'    : field_id,
         'cb'          : cb,
     }
 
-    req = {
-        'user_id'   : user_id,
-        'type'      : 'input',
-        'contents'  : contents,
-    }
-
-    old_form = s_view.Read('displayed_form')
-    if old_form:
-        await old_form.Hide()
-    resp = back_api.AcceptInput(req)
-    form = FormFactory.Make(resp['contents'], tg_user_id)
-    await form.Display()
-    s_view.Write('displayed_form', form)
+    await handle_back_request(contents, s_view)
 
