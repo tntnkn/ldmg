@@ -1,2 +1,3 @@
-from .Storage   import Storage, UserStorageView
+from .Storage           import Storage
+from .UserStorageView   import UserStorageView
 
