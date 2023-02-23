@@ -7,7 +7,7 @@ from .Form       import Form, FormType
 from .Types      import ID_TYPE
 from .Graph      import Graph
 from .Exceptions import UnknownFormType, TableIsEmpty
-from .Models     import StateFieldsConsts, TransitionFieldConsts, FormFieldConsts
+from .Models     import StateFieldsConsts, TransitionFieldConsts, TransitionTypesConsts, FormFieldConsts
 
 
 class Loader():
@@ -110,10 +110,19 @@ class Loader():
                     'form_elem_ids' : fields.get(
                         TransitionFieldConsts.FORM_CONDITIONS, list()),
             }
-            if len(transition['form_elem_ids']) == 0:
-                transition['type'] = TransitionType.UNCONDITIONAL
-            else:
-                transition['type'] = TransitionType.CONDITIONAL
+
+            cond = fields.get(
+                TransitionFieldConsts.TRANSITION_CONDITION)
+            match cond:
+                case TransitionTypesConsts.CONDITIONAL:
+                    transition['type']=TransitionType.CONDITIONAL
+                case TransitionTypesConsts.UNCONDITIONAL:
+                    transition['type']=TransitionType.UNCONDITIONAL
+                case TransitionTypesConsts.STRICT:
+                    transition['type']=TransitionType.STRICT
+                case _:
+                    raise RuntimeError(
+                      'Transitions does not have a condition set')
 
             self.graph.AddTransition(transition)
         return self.graph.transitions

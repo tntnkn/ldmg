@@ -8,6 +8,7 @@ from .Types     import ID_TYPE
 class TransitionType(Enum):
     UNKNOWN         = 'UNKNOWN'
     CONDITIONAL     = 'CONDITIONAL'
+    STRICT          = 'STRICT'
     UNCONDITIONAL   = 'UNCONDITIONAL'
 
 

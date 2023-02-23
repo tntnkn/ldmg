@@ -10,6 +10,13 @@ class TransitionFieldConsts():
     SOURCE              = 'Откуда'
     TARGET              = 'Куда'
     FORM_CONDITIONS     = 'Эллемент формы'
+    TRANSITION_CONDITION= 'Условие перехода'
+
+
+class TransitionTypesConsts():
+    CONDITIONAL     = 'По формам'
+    STRICT          = 'Закончить все формы'
+    UNCONDITIONAL   = 'Без условия'
 
 
 class FormFieldConsts():
