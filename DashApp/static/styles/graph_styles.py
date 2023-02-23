@@ -48,6 +48,13 @@ graph_stylesheet=[
         }
     },
     {
+        'selector': '.strict_edge',
+        'style': {
+            'line-color': '#C8C8A8',
+            'target-arrow-color': '#C8C8A8',
+        }
+    },
+    {
         'selector': '.always_reachable_edge',
         'style': {
             'label': '',

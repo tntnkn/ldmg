@@ -1,5 +1,5 @@
 from typing     import Dict
-from .Types      import NodeType, EdgeType
+from .Types     import NodeType, EdgeType
 
 
 def get_node_type_class(node_type : str) -> str:
@@ -24,6 +24,8 @@ def get_edge_type_class(edge_type : str) -> str:
             return 'cond_edge ' 
         case EdgeType.UNCONDITIONAL.value:
             return 'uncond_edge ' 
+        case EdgeType.STRICT.value:
+            return 'strict_edge ' 
         case EdgeType.ALWAYS_REACHABLE.value:
             return 'always_reachable_edge ' 
         case _:

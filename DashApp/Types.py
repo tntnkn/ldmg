@@ -15,5 +15,6 @@ class EdgeType(Enum):
     UNKNOWN             = 'UNKNOWN'
     CONDITIONAL         = 'CONDITIONAL'
     UNCONDITIONAL       = 'UNCONDITIONAL'
+    STRICT              = 'STRICT'
     ALWAYS_REACHABLE    = 'ALWAYS_REACHABLE'
 
