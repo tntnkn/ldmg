@@ -50,18 +50,15 @@ class Form():
 
     def AcceptInput(self, input, context: Context) -> None:
         field = self.fields[input['field_id']]
-        try:
-            field.AcceptInput(input, context)
-        except FormElemSwitchedHistory:
-            return
-        next_id = StateHistory.DetermineNextState(context)
-        StateHistory.SetNext(next_id, context)
+        field.AcceptInput(input, context)
 
     def Reject(self, context: Context) -> None:
         for field in self.fields.values():
             field.Reject(context)
 
     def ToDict(self, context: Context) -> List[Dict]:
+        next_id = StateHistory.DetermineNextState(context)
+        StateHistory.SetNext(next_id, context)
         repr: List[Dict] = list()
         for field in self.fields.values():
             field.AddRepr(repr, context)

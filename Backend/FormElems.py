@@ -121,7 +121,7 @@ class ButtonFormElem(FormElem):
         next_id = self.FormElemToNext(context)
         StateHistory.SetNext(next_id, context)
         StateHistory.SwitchToNext(context)
-        raise FormElemSwitchedHistory(self.text) 
+        #raise FormElemSwitchedHistory(self.text) 
     
 
 class SingleChoiceFormElem(FormElem):
