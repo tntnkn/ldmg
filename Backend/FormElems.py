@@ -31,6 +31,12 @@ class RegularFieldFormElem(FormElem):
         else:
             super().AcceptInput(input, context)
 
+    def IsGroupCompleted(self, context):
+        for groupee in self.group:
+            if not groupee.IsCompleted(context):
+                return False
+        return True
+
     def ToDict(self, context: Context) -> Dict:
         d = super().ToDict(context)
         t = context.user_input.Read(self.storage_id)

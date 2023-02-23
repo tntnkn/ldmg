@@ -1,12 +1,14 @@
 from collections    import OrderedDict
+import json
 
 from .Factories     import FormElemFactory
 from .Interface     import FormElem
 from .StateHistory  import StateHistory
 from .Exceptions    import FormElemSwitchedHistory
 from .Storage       import Context, Models as M
-from typing         import Dict, List
-import json
+
+from typing         import Dict, List, Union
+from .Types         import BranchTypes
 
 
 class Form():
@@ -57,7 +59,7 @@ class Form():
             field.Reject(context)
 
     def ToDict(self, context: Context) -> List[Dict]:
-        next_id = StateHistory.DetermineNextState(context)
+        next_id = self.DetermineNextState(context)
         StateHistory.SetNext(next_id, context)
         repr: List[Dict] = list()
         for field in self.fields.values():
@@ -69,6 +71,37 @@ class Form():
         elif StateHistory.AtEnd(context):
             repr.append(self.done_b_tpl)
         return repr
+
+    def DetermineNextState(self, context: Context) -> Union[M.ID, None]:
+        cur_id   = StateHistory.GetCurrent(context)
+        branches = context.general_info.Read('branches')[cur_id]
+        u_input  = context.user_input
+        all_inps = context.general_info.Read(
+                'possible_inp_ids')[cur_id]
+
+        for branch in branches:
+            print(branch['type'].value)
+            match branch['type'].value:
+                case BranchTypes.CONDITIONAL:
+                    for inp in branch['req_user_input_ids']:
+                        if not self.fields[inp].IsCompleted(
+                                context):
+                            break
+                    else:
+                        return branch['resulting_state_id']
+                case BranchTypes.UNCONDITIONAL:
+                    return branch['resulting_state_id']
+                case BranchTypes.STRICT:
+                    print('IN STRICT!')
+                    for inp in all_inps:
+                        print(inp)
+                        if not self.fields[inp].IsGroupCompleted(
+                                context):
+                            break
+                        print(inp, 'is OK!')
+                    else:
+                        return branch['resulting_state_id']
+        return None
 
     def ToJson(self, context) -> str:
         return json.dumps( self.ToDict(context) )

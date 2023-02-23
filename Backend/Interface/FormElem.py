@@ -34,6 +34,12 @@ class FormElem():
         return self.is_completed
         #return True if context.user_input.Contains(self.storage_id) else False
 
+    def IsGroupCompleted(self, context):
+        for groupee in self.group:
+            if groupee.IsCompleted(context):
+                return True
+        return False
+
     def ToDict(self, context: Context) -> Dict:
         return {
             'id'        : self.id,

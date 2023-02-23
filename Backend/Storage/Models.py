@@ -1,4 +1,5 @@
 from typing     import TypedDict, Dict, List, Union
+from ..Types    import BranchTypes
 
 ID = str
 
@@ -9,6 +10,7 @@ class UserContext(TypedDict):
     state_history       : List[ID]
 
 class Branch(TypedDict):
+    type                : BranchTypes
     req_user_input_ids  : List[ID] 
     resulting_state_id  : ID
 
@@ -22,7 +24,12 @@ class MainStorageContents(TypedDict):
 
 MainStorage = Dict[ID, MainStorageContents]
 
+PossibleInpIds = Dict[ID, List[ID]]
+
 class GeneralInfo(TypedDict):
     branches            : StatesBranchesStorage
     start_id            : ID
+    end_ids             : ID
+    always_open_ids     : ID
+    possible_inp_ids    : PossibleInpIds
 

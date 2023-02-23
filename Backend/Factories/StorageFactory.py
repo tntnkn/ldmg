@@ -15,13 +15,20 @@ class StorageFactory():
     def Make() -> Storage:
         g = StorageFactory.graph
         user_input_model : Models.UserInput = {
-            field['id']: None for field in
-                StorageFactory.forms.values() }
+            field['id']: None 
+                for field in StorageFactory.forms.values()
+                if field['type'] != 'TEXT' 
+        }
+
         states_branches_storage : Models.StatesBranchesStorage = dict()
+        possible_inp_ids : Models.PossibleInpIds = dict()
+
         for s_id, state in g.states.items():
             branches : Models.StateBranches = list()
             for tr_id in state['out_transitions_ids']:
                 branch : Models.Branch = {
+                    'type'               :
+                        g.transitions[tr_id]['type'],
                     'req_user_input_ids' : 
                         g.transitions[tr_id]['form_elem_ids'],
                     'resulting_state_id' :
@@ -29,11 +36,14 @@ class StorageFactory():
                 }
                 branches.append(branch)
             states_branches_storage[s_id] = branches
+            possible_inp_ids[s_id] = state['forms_ids']
+
         general_info : Models.GeneralInfo = {
             'branches' : states_branches_storage,
             'start_id' : g.start_node_id,
             'end_ids'  : g.end_node_ids,
-            'always_open_ids' : g.always_open_ids,
+            'always_open_ids'   : g.always_open_ids,
+            'possible_inp_ids'   : possible_inp_ids, 
         }
         return Storage(user_input_model, general_info)
 

@@ -24,3 +24,9 @@ class FormElemsTypes():
     s_choice        = 'S_CHOICE'
     m_choice        = 'M_CHOICE'
 
+
+class BranchTypes():
+    CONDITIONAL     = 'CONDITIONAL'
+    STRICT          = 'STRICT'
+    UNCONDITIONAL   = 'UNCONDITIONAL'
+

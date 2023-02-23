@@ -27,14 +27,37 @@ class StateHistory():
         if next_id:
             hst.append(next_id)
         context.user_context.Write('state_history', hst)
-
+        return 
+    """
     @staticmethod
     def DetermineNextState(context: Context) -> Union[M.ID, None]:
         cur_id   = StateHistory.GetCurrent(context)
         branches = context.general_info.Read('branches')[cur_id]
         u_input  = context.user_input
+        all_inps = context.general_info.Read(
+                'possible_inp_ids')[cur_id]
 
         for branch in branches:
+            print(branch['type'].value)
+            match branch['type'].value:
+                case BranchTypes.CONDITIONAL:
+                    for inp in branch['req_user_input_ids']:
+                        if not u_input.Contains(inp):
+                            break
+                    else:
+                        return branch['resulting_state_id']
+                case BranchTypes.UNCONDITIONAL:
+                    return branch['resulting_state_id']
+                case BranchTypes.STRICT:
+                    print('IN STRICT!')
+                    for inp in all_inps:
+                        print(inp)
+                        if not u_input.Contains(inp):
+                            break
+                        print(inp, 'is OK!')
+                    else:
+                        return branch['resulting_state_id']
+
             if len(branch['req_user_input_ids']) == 0:
                 return branch['resulting_state_id']
             for inp in branch['req_user_input_ids']:
@@ -42,7 +65,7 @@ class StateHistory():
                     break
                 return branch['resulting_state_id']
         return None
-
+    """
     @staticmethod
     def AtEnd(context: Context) -> bool:
         cur_id   = StateHistory.GetCurrent(context)
