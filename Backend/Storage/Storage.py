@@ -30,6 +30,7 @@ class Storage(StorageInterface):
             'user_context'    : {
                 'current_state_idx' : 0,
                 'state_history'     : [self.general_info['start_id'],],
+                'rejected_states'   : list(),
             },
             'user_input'      : deepcopy(self.user_input_model),
         }

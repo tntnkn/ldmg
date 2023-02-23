@@ -8,12 +8,13 @@ class StateMachine():
         pass
 
     def Go(self, context, input=None):
-        self.Process(context, input)
+        self.__Process(context, input)
+        self.__HandleRejectedStates(context)
         cur_id = StateHistory.GetCurrent(context)
         form = FormPrototypeFactory.Get(cur_id)
         return form.ToDict(context)
 
-    def Process(self, context, input):
+    def __Process(self, context, input):
         if input is None:
             pass
         elif input['field_id'] == 'next':
@@ -27,4 +28,12 @@ class StateMachine():
             cur_id = StateHistory.GetCurrent(context)
             form = FormPrototypeFactory.Get(cur_id)
             form.AcceptInput(input, context)
+
+    def __HandleRejectedStates(self, context):
+        rejected = context.user_context.Read('rejected_states')
+        while len(rejected) != 0:
+            r = rejected.pop()
+            form = FormPrototypeFactory.Get(r)
+            form.Reject(context)
+        context.user_context.Write('rejected_states', rejected)
 

@@ -11,10 +11,10 @@ class RegularTextFormElem(FormElem):
         self.type: str = 'TEXT'
 
     def AcceptInput(self, input, context: Context):
-        raise NotImplementedError
+        pass
 
     def Reject(self, context: Context) -> None:
-        raise NotImplementedError
+        pass
 
     def IsCompleted(self, context: Context) -> bool:
         return True

@@ -8,6 +8,7 @@ UserInput = Dict[ID, Union[str, None]]
 class UserContext(TypedDict):
     current_state_idx   : int 
     state_history       : List[ID]
+    rejected_states     : List[ID] 
 
 class Branch(TypedDict):
     type                : BranchTypes

@@ -23,11 +23,13 @@ class StateHistory():
         hst = context.user_context.Read('state_history')
         if len(hst)-1 > idx and hst[idx+1]==next_id:
             return
-        hst=hst[0:idx+1]
+        reject = hst[idx+1:-1]
+        context.user_context.Write('rejected_states', reject)
+        hst = hst[0:idx+1]
         if next_id:
             hst.append(next_id)
         context.user_context.Write('state_history', hst)
-        return 
+
     """
     @staticmethod
     def DetermineNextState(context: Context) -> Union[M.ID, None]:
