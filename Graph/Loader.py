@@ -148,10 +148,8 @@ class Loader():
             if form['type'] == FormType.UNKNOWN:
                 raise UnknownFormType(form['name'])
 
-            if len(form['state_id']) == 1:
+            if form['state_id']:
                 form['state_id'] = form['state_id'][0]
-            else:
-                form['state_id'] = None
 
             self.forms[form['id']] = form
         return self.forms
