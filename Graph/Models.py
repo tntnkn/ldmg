@@ -23,4 +23,5 @@ class FormFieldConsts():
     NAME                = 'Название'
     TYPE                = 'Тип'
     STATE_ID            = 'Состояние'
+    TAGS                = 'jinja tags'
 

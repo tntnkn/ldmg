@@ -20,6 +20,7 @@ class Form(TypedDict, total=True):
     name            : str
     type            : FormType
     state_id        : ID_TYPE
+    tags            : Union[List[str], None]
 
 
 def get_dummy_form() -> Form:
@@ -28,6 +29,7 @@ def get_dummy_form() -> Form:
         'name'          : 'dummy',
         'type'          : FormType.UNKNOWN,
         'state_id'      : '0',
+        'tags'          : None,
     }
 
 if __name__ == '__main__':

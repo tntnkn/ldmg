@@ -1,7 +1,8 @@
-from ..API      import API
-from .Messages  import *
-from ..Exceptions   import UserDone
 import uuid
+
+from ..API          import API
+from .Messages      import *
+from ..Exceptions   import UserDone
 
 
 class MonoAPI(API):
@@ -27,10 +28,18 @@ class MonoAPI(API):
                 'contents'  : form,
             }
         except UserDone:
-            info = context.user_input.ReadAll()
+            tags = context.general_info.Read('tags_by_field_id')
+            inps = context.user_input.ReadAll()
+            cont = dict()
+            for f_id, tgs in tags.items():
+                if not tgs:
+                    continue
+                for t in tgs.split(','):
+                    cont[t] = inps[f_id]
+
             return {
                 'user_id'   : user_id,
                 'type'      : MessageType.PositiveEnd,
-                'contents'  : info,
+                'contents'  : cont,
             }
 

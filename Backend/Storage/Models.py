@@ -4,6 +4,7 @@ from ..Types    import BranchTypes
 ID = str
 
 UserInput = Dict[ID, Union[str, None]]
+Tags      = Dict[ID, Union[List[str], None]]
 
 class UserContext(TypedDict):
     current_state_idx   : int 

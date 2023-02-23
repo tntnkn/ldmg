@@ -1,4 +1,4 @@
-from ..Factories    import BackAPIFactory, FormFactory
+from ..Factories    import BackAPIFactory, FormFactory, DocumentFactory
 from ..Storage      import UserStorageView
 from ..Utils        import CallbackTransformer, AllowedInputTypeHelper, Send, MessagesArchive, MessageManager
 from ..Static       import AllowedInputType
@@ -25,10 +25,13 @@ async def handle_back_request(contents, s_view):
     resp = back_api.AcceptInput(req)
 
     if resp['type'] == 'pos_end':
+        """
         text = ''
         for key, value in resp['contents'].items():
             text += f"{key} -- {value}\n"
-        await MessageManager.SendText(text, tg_user_id) 
+        """
+        doc = DocumentFactory.Make(resp['contents'])
+        await MessageManager.SendDocument(doc, tg_user_id)
         await MessagesArchive.Clear(tg_user_id)
         s_view.Destroy()
         return

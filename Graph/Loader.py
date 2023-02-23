@@ -138,6 +138,8 @@ class Loader():
                 'type'      : FormType.UNKNOWN,
                 'state_id'  : fields.get(
                     FormFieldConsts.STATE_ID, None),
+                'tags'      : fields.get(
+                    FormFieldConsts.TAGS, None),
             }
 
             t = record['fields'].get(FormFieldConsts.TYPE, None)

@@ -20,8 +20,15 @@ class MessageManager():
                  parse_mode=ParseMode.HTML)
         return resp.message_id
 
+    @staticmethod
     async def Delete(message_id, tg_user_id):
-        await bot.delete_message(tg_user_id, message_id)
+        return await bot.delete_message(tg_user_id, message_id)
+
+    @staticmethod
+    async def SendDocument(document, tg_user_id):
+        return await bot.send_document(
+                chat_id=tg_user_id, 
+                document=document)
 
 
 class Send():
