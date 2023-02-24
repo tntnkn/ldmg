@@ -28,10 +28,17 @@ MainStorage = Dict[ID, MainStorageContents]
 
 PossibleInpIds = Dict[ID, List[ID]]
 
+class Document(TypedDict):
+    tag         : str
+    doc_name    : str
+
+Documents = List[Document] 
+
 class GeneralInfo(TypedDict):
     branches            : StatesBranchesStorage
     start_id            : ID
     end_ids             : ID
     always_open_ids     : ID
     possible_inp_ids    : PossibleInpIds
+    documents           : Documents
 

@@ -30,16 +30,21 @@ class MonoAPI(API):
         except UserDone:
             tags = context.general_info.Read('tags_by_field_id')
             inps = context.user_input.ReadAll()
-            cont = dict()
+
+            tags_inps = dict()
             for f_id, tgs in tags.items():
                 if not tgs:
                     continue
                 for t in tgs.split(','):
-                    cont[t] = inps[f_id]
+                    tags_inps[t] = inps[f_id]
+
+            contents = {
+                'tags'      : tags_inps,
+            }
 
             return {
                 'user_id'   : user_id,
-                'type'      : MessageType.PositiveEnd,
-                'contents'  : cont,
+                'type'      : MessageType.DocInfoOut,
+                'contents'  : contents,
             }
 

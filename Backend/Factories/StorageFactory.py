@@ -5,11 +5,13 @@ from typing     import Dict
 class StorageFactory():
     graph = None
     forms: Dict
+    docs : Dict
 
     @staticmethod
-    def INIT(graph, forms) -> None:
+    def INIT(graph, forms, docs) -> None:
         StorageFactory.graph = graph
         StorageFactory.forms = forms
+        StorageFactory.docs  = docs
 
     @staticmethod
     def Make() -> Storage:
@@ -42,6 +44,11 @@ class StorageFactory():
             states_branches_storage[s_id] = branches
             possible_inp_ids[s_id] = state['forms_ids']
 
+        docs = [
+            {'tag' : doc['tag'], 'doc_name' : doc['doc_name']} for\
+                doc in StorageFactory.docs.values()
+        ]
+        
         general_info : Models.GeneralInfo = {
             'branches' : states_branches_storage,
             'start_id' : g.start_node_id,
@@ -49,6 +56,7 @@ class StorageFactory():
             'always_open_ids'   : g.always_open_ids,
             'possible_inp_ids'  : possible_inp_ids, 
             'tags_by_field_id'  : tags_by_field_id,
+            'documents'         : docs
         }
         return Storage(user_input_model, general_info)
 

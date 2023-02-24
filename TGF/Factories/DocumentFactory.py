@@ -9,7 +9,8 @@ class DocumentFactory():
         DocumentFactory.docgen = docgen
 
     @staticmethod
-    def Make(tags):
-        f_name = DocumentFactory.docgen.MakeDocument(tags).f_name
+    def Make(contents):
+        f_name = DocumentFactory.docgen.MakeDocument(
+                contents['tags']).f_name
         return InputFile(f_name, filename="Иск.docx")        
 

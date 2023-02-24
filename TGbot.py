@@ -5,8 +5,12 @@ from Docgen         import Docgen
 
 
 def main():
-    register_docgen( Docgen() )
-    start_bot( get_api( Loader() ) )
+    loader      = Loader()
+    back_api    = get_api( loader ) 
+    docgen      = Docgen(loader.docs)
+
+    register_docgen( docgen )
+    start_bot(back_api)
 
 
 if __name__ == '__main__':

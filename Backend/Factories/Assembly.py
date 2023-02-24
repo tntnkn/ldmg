@@ -9,19 +9,22 @@ class Assembly():
 
     graph           = None
     forms           = None
+    docs            = None
 
     @staticmethod
     def Assemble(loader):
         graph = loader.graph
         forms = loader.forms
+        docs  = loader.docs
         Assembly.graph = graph
         Assembly.forms = forms
+        Assembly.docs  = docs
 
         print("Building forms factory")
         FormPrototypeFactory.INIT(graph.states, forms)
         Assembly.__PrintFormPrototypes()
 
-        StorageFactory.INIT(graph, forms)
+        StorageFactory.INIT(graph, forms, docs)
         Assembly.storage = StorageFactory.Make()
         ActiveUsersFactory.INIT(Assembly.storage)
         Assembly.active_users = ActiveUsersFactory.Make()

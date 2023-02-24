@@ -5,7 +5,7 @@ from typing     import TypedDict, Dict, Union
 class MessageType():
     Input       = 'input'
     FormOut     = 'form'
-    PositiveEnd = 'pos_end'
+    DocInfoOut  = 'doc_info'
 
 
 class Form(TypedDict):
@@ -22,12 +22,19 @@ class Input(TypedDict):
     cb          : str
 
 
-class Output(TypedDict):
+class OutForm(TypedDict):
     form        : Form
+
+
+Tag = str 
+Inp = str
+class OutInfoForDocgen(TypedDict):
+    tags        : Dict[Tag, Inp]
+    docs        : M.Documents
 
 
 class Message(TypedDict):
     user_id     : M.ID 
     type        : str
-    contents    : Union[Input, Output, None]
+    contents    : Union[Input, OutForm, OutInfoForDocgen, None]
 

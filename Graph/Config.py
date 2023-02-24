@@ -16,6 +16,8 @@ class Config():
                 os.getenv('AIRTABLE_TRANSITIONS_TABLE_ID')
         self.AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID = \
                 os.getenv('AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID')
+        self.AIRTABLE_DOCS_TABLE_ID        =\
+                os.getenv('AIRTABLE_DOCS_TABLE_ID')
 
 
 config = Config()

@@ -4,10 +4,11 @@ from .           import Config
 from .State      import State, StateType
 from .Transition import Transition, TransitionType 
 from .Form       import Form, FormType
+from .Doc        import Doc
 from .Types      import ID_TYPE
 from .Graph      import Graph
 from .Exceptions import UnknownFormType, TableIsEmpty
-from .Models     import StateFieldsConsts, TransitionFieldConsts, TransitionTypesConsts, FormFieldConsts
+from .Models     import StateFieldsConsts, TransitionFieldConsts, TransitionTypesConsts, FormFieldConsts, DocFieldConsts 
 
 
 class Loader():
@@ -15,8 +16,10 @@ class Loader():
         self.states_records         = list()
         self.transitions_records    = list()
         self.forms_records          = list()
+        self.docs_records           = list()
 
         self.forms : Dict[ID_TYPE, Form] = dict()
+        self.docs  : Dict[ID_TYPE, Doc]  = dict()
 
         self.graph                  = Graph()
 
@@ -46,16 +49,26 @@ class Loader():
         if len(self.forms_records) == 0:
             raise TableIsEmpty('Forms')
 
+        docs_table          = Table(config.AIRTABLE_API_KEY, 
+                                config.AIRTABLE_BASE_ID,
+                                config.AIRTABLE_DOCS_TABLE_ID,
+                                )
+        self.docs_records  = docs_table.all()
+        if len(self.docs_records) == 0:
+            raise TableIsEmpty('Docs')
+
     
     def load_graph(self):
         if len(self.states_records) == 0 or\
            len(self.transitions_records) == 0 or\
-           len(self.forms_records) == 0:
+           len(self.forms_records) == 0 or\
+           len(self.docs_records) == 0:
                self.load_tables()
 
         s = self.process_states_records()
         t = self.process_transitions_records()
         f = self.process_forms_records()
+        d = self.process_docs_records()
 
         self.connect_states_with_forms(s, f)
 
@@ -157,6 +170,20 @@ class Loader():
         return self.forms
 
 
+    def process_docs_records(self):
+        for record in self.docs_records:
+            fields = record['fields']
+            suit : Doc = {
+                'id'        : record['id'],
+                'name'      : fields[DocFieldConsts.NAME],
+                'tag'       : fields[DocFieldConsts.TAG],
+                'doc_name'  : fields[DocFieldConsts.DOC_NAME],
+            }
+            
+            self.docs[suit['id']] = suit
+        return self.docs
+
+
     def connect_states_with_forms(self, states: Dict, forms: Dict):
         for form in forms.values():
             state = states.get(form['state_id'], None)
@@ -185,9 +212,12 @@ if __name__ == '__main__':
     print(loader.transitions_records)
     print('\FORMS RECORDS') 
     print(loader.forms_records)
+    print('\DOCS RECORDS') 
+    print(loader.docs_records)
     loader.process_states_records()
     loader.process_transitions_records()
     loader.process_forms_records()
+    loader.process_docs_records()
     loader.load_graph()
     print('\n\n')
     print('STATES')
@@ -199,4 +229,7 @@ if __name__ == '__main__':
     print('FORMS')
     for form in loader.forms.values():
         print(form, '\n')
+    print('DOCS')
+    for suit in loader.docs.values():
+        print(suit, '\n')
 

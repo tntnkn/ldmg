@@ -67,6 +67,18 @@ class UnknownFormType(Exception):
     def __reduce__(self):
         return (UnknownFormType, (self.message, self.f_type))
 
+
+class UnknownFormType(Exception):
+    def __init__(self, f_type):
+        self.message    = 'Unknown form type:'
+        self.f_type     = f_type
+
+        super(UnknownFormType, self).__init__( (self.message, f_type) )
+
+    def __reduce__(self):
+        return (UnknownFormType, (self.message, self.f_type))
+
+
 class TableIsEmpty(Exception):
     def __init__(self, table):
         self.message    = 'Table is empty:'

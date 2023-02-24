@@ -14,9 +14,9 @@ class TransitionFieldConsts():
 
 
 class TransitionTypesConsts():
-    CONDITIONAL     = 'По формам'
-    STRICT          = 'Закончить все формы'
-    UNCONDITIONAL   = 'Без условия'
+    CONDITIONAL         = 'По формам'
+    STRICT              = 'Закончить все формы'
+    UNCONDITIONAL       = 'Без условия'
 
 
 class FormFieldConsts():
@@ -24,4 +24,10 @@ class FormFieldConsts():
     TYPE                = 'Тип'
     STATE_ID            = 'Состояние'
     TAGS                = 'jinja tags'
+
+
+class DocFieldConsts():
+    NAME                = 'Иск'
+    TAG                 = 'tag'
+    DOC_NAME            = 'Название документа'
 
