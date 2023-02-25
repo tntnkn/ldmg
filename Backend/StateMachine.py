@@ -24,6 +24,17 @@ class StateMachine():
         elif input['field_id'] == 'done':
             print("WE ARE DONE!")
             raise UserDone
+        elif input['field_id'] == 'done':
+            print("WE ARE DONE!")
+            raise UserDone
+        elif input['field_id'] is None:
+            # this one is for always reachable states
+            next_id = input['cb']
+            cur_id  = StateHistory.GetCurrent(context)
+            if next_id == cur_id:
+                return
+            StateHistory.SetNext(next_id, context) 
+            StateHistory.SwitchToNext(context)
         else:
             cur_id = StateHistory.GetCurrent(context)
             form = FormPrototypeFactory.Get(cur_id)

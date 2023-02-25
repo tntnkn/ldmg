@@ -80,7 +80,6 @@ class Form():
                 'possible_inp_ids')[cur_id]
 
         for branch in branches:
-            print(branch['type'].value)
             match branch['type'].value:
                 case BranchTypes.CONDITIONAL:
                     for inp in branch['req_user_input_ids']:
@@ -92,13 +91,10 @@ class Form():
                 case BranchTypes.UNCONDITIONAL:
                     return branch['resulting_state_id']
                 case BranchTypes.STRICT:
-                    print('IN STRICT!')
                     for inp in all_inps:
-                        print(inp)
                         if not self.fields[inp].IsGroupCompleted(
                                 context):
                             break
-                        print(inp, 'is OK!')
                     else:
                         return branch['resulting_state_id']
         return None

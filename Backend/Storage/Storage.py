@@ -39,7 +39,7 @@ class Storage(StorageInterface):
     def GetUserContext(self, user_id: M.ID) -> Context:
         return Context( self.__GetUserInput(user_id),
                         self.__GetUserContext(user_id),
-                        self.__GetGeneralInfoStorage() )
+                        self.GetGeneralInfoStorage() )
 
     def __GetUserInput(self, user_id: M.ID) -> UserInputStorage:
         self.AssertUser(user_id)
@@ -51,7 +51,7 @@ class Storage(StorageInterface):
         return UserContextStorage(  
             self.main_storage[user_id]['user_context'] )
 
-    def __GetGeneralInfoStorage(self) -> GeneralInfoStorage:
+    def GetGeneralInfoStorage(self) -> GeneralInfoStorage:
         return GeneralInfoStorage(self.general_info)
 
     def __NewUser(self, user_id: M.ID, contents:M.MainStorageContents):

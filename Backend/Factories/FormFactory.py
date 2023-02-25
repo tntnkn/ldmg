@@ -10,7 +10,7 @@ class FormPrototypeFactory():
     def INIT(states, fields):
         for state in states.values():
             #print(" -- STATE FORMS IDS ARE ", state['forms_ids'])
-            if state['forms_ids']:
+            #if state['forms_ids']:
                 FormPrototypeFactory.prototypes[state['id']]=Form(
                     state['id'],
                     [ fields[f_id] for f_id in state['forms_ids'] ]

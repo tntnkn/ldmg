@@ -28,8 +28,10 @@ class Assembly():
         Assembly.storage = StorageFactory.Make()
         ActiveUsersFactory.INIT(Assembly.storage)
         Assembly.active_users = ActiveUsersFactory.Make()
-        
-        APIFactory.INIT(Assembly.active_users, StateMachine())
+
+        APIFactory.INIT(Assembly.active_users, 
+                        Assembly.storage.GetGeneralInfoStorage(),
+                        StateMachine())
         Assembly.api = APIFactory.Make()
 
     @staticmethod

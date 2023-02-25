@@ -1,5 +1,5 @@
 from ..Factories    import BackAPIFactory, FormFactory, DocumentFactory
-from ..Storage      import UserStorageView
+from ..Storage      import UserStorageView, Storage
 from ..Utils        import CallbackTransformer, AllowedInputTypeHelper, Send, MessagesArchive, MessageManager
 from ..Static       import AllowedInputType
 from ..bot          import dp, types
@@ -42,6 +42,7 @@ async def handle_back_request(contents, s_view):
 @dp.message_handler(commands=['start'])
 async def startCommandHandler(message: types.Message):
     user_id = back_api.NewUser() 
+    Storage().AddUser(message.from_id)
     s_view  = UserStorageView(message.from_id)
     s_view.Write('back_id', user_id)
 
@@ -50,10 +51,45 @@ async def startCommandHandler(message: types.Message):
     allowed = s_view.Read('allowed_input_types')
     allowed = AllowedInputTypeHelper.AddAllowedInput(
             AllowedInputType.CB, allowed)
+    allowed = AllowedInputTypeHelper.AddAllowedInput(
+            AllowedInputType.COMMANDS, allowed)
     s_view.Write('allowed_input_types', allowed)
 
     await handle_old_form(s_view)
     await handle_back_request(None, s_view)
+
+
+@dp.message_handler(commands=\
+        [ command['command'] for command in Storage().GetCommands() ]
+)
+async def otherCommandsHandler(message: types.Message):
+    tg_user_id  = message.from_id
+    command     = message.text
+
+    try:
+        s_view  = UserStorageView(message.from_id)
+    except:
+        await Send.NoCommandsInputWarning(tg_user_id)
+        return
+
+    MessagesArchive.Memo(message.message_id, tg_user_id)
+
+    allowed = s_view.Read('allowed_input_types')
+    allowed = AllowedInputTypeHelper.DeleteAllowedInput(
+            AllowedInputType.TEXT, allowed)
+    s_view.Write('allowed_input_types', allowed)
+
+    await handle_old_form(s_view)
+
+    cs = Storage().GetCommands()
+    i  = next( (c['back_id'] for c in cs if c['command']==command[1:]) )
+    contents = {
+        'field_type'  : None,
+        'field_id'    : None,
+        'cb'          : i,
+    }
+
+    await handle_back_request(contents, s_view)
 
 
 # --- Text input handlers

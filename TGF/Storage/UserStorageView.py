@@ -5,7 +5,7 @@ class UserStorageView():
     def __init__(self, tg_user_id):
         s_h = Storage()
         if not s_h.HasUser(tg_user_id):
-            s_h.AddUser(tg_user_id)
+            raise RuntimeError(f"No registered user with id {tg_user_id}")
         self.data = s_h.GetUserData(tg_user_id)
         self.tg_user_id = tg_user_id
 

@@ -6,10 +6,24 @@ from ..Exceptions   import UserDone
 
 
 class MonoAPI(API):
-    def __init__(self, active_users, state_machine):
+    def __init__(self, active_users, general_info, state_machine):
         super().__init__()
         self.active_users  = active_users
         self.state_machine = state_machine
+        self.general_info  = general_info
+
+    def RegisterFrontendAPI(self, api):
+        contents = {
+            'start_id'        : self.general_info.Read('start_id'),
+            'end_ids'         : self.general_info.Read('end_ids'),
+            'always_open_ids' : self.general_info.Read('always_open_ids'),
+            'states_names'    : self.general_info.Read('states_names'),
+        }
+        return {
+            'user_id'   : None,
+            'type'      : MessageType.FrontAccepted,
+            'contents'  : contents,
+        }
 
     def NewUser(self) -> str:
         user_id = uuid.uuid4()

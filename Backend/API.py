@@ -5,6 +5,9 @@ class API():
     def __init__(self):
         pass
 
+    def RegisterFrontendAPI(self, api):
+        pass
+
     def NewUser(self):
         pass
 

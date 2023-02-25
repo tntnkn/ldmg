@@ -28,6 +28,7 @@ class StorageFactory():
 
         states_branches_storage : Models.StatesBranchesStorage = dict()
         possible_inp_ids : Models.PossibleInpIds = dict()
+        states_names : Models.StatesNames = dict()
 
         for s_id, state in g.states.items():
             branches : Models.StateBranches = list()
@@ -43,6 +44,7 @@ class StorageFactory():
                 branches.append(branch)
             states_branches_storage[s_id] = branches
             possible_inp_ids[s_id] = state['forms_ids']
+            states_names[s_id] = state['name']
 
         docs = [
             {'tag' : doc['tag'], 'doc_name' : doc['doc_name']} for\
@@ -50,11 +52,16 @@ class StorageFactory():
         ]
         
         general_info : Models.GeneralInfo = {
-            'branches' : states_branches_storage,
-            'start_id' : g.start_node_id,
-            'end_ids'  : g.end_node_ids,
+            # info for navigation 
+            'start_id'          : g.start_node_id,
+            'end_ids'           : g.end_node_ids,
             'always_open_ids'   : g.always_open_ids,
+            # info for display (names, descriptions)
+            'states_names'      : states_names,
+            # info for branching
+            'branches'          : states_branches_storage,
             'possible_inp_ids'  : possible_inp_ids, 
+            # info for docgen
             'tags_by_field_id'  : tags_by_field_id,
             'documents'         : docs
         }

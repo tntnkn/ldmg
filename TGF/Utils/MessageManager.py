@@ -50,3 +50,9 @@ class Send():
                 'Введите данные:', 
                 tg_user_id)
 
+    @staticmethod
+    async def NoCommandsInputWarning(tg_user_id):
+        return await MessageManager.SendText(
+                'Прежде всего нажмите /start', 
+                tg_user_id)
+

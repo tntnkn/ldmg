@@ -4,7 +4,6 @@ from ..Types    import BranchTypes
 ID = str
 
 UserInput = Dict[ID, Union[str, None]]
-Tags      = Dict[ID, Union[List[str], None]]
 
 class UserContext(TypedDict):
     current_state_idx   : int 
@@ -33,12 +32,15 @@ class Document(TypedDict):
     doc_name    : str
 
 Documents = List[Document] 
+Tags      = Dict[ID, Union[List[str], None]]
+StatesNames = Dict[ID, str]
 
 class GeneralInfo(TypedDict):
-    branches            : StatesBranchesStorage
     start_id            : ID
     end_ids             : ID
     always_open_ids     : ID
+    states_names        : StatesNames
+    branches            : StatesBranchesStorage
     possible_inp_ids    : PossibleInpIds
+    tags_by_field_id    : Tags
     documents           : Documents
-
