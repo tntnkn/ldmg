@@ -123,6 +123,7 @@ class ButtonFormElem(FormElem):
     def AcceptInput(self, input, context: Context) -> None:
         for groupee in self.group:
             groupee.Reject(context)
+        input['cb'] = True
         super().AcceptInput(input, context)
         next_id = self.FormElemToNext(context)
         StateHistory.SetNext(next_id, context)
@@ -140,6 +141,7 @@ class SingleChoiceFormElem(FormElem):
             return self.Reject(context)
         for groupee in self.group:
             groupee.Reject(context)
+        input['cb'] = True
         return super().AcceptInput(input, context)
 
 
@@ -151,5 +153,6 @@ class MultiChoiceFormElem(FormElem):
     def AcceptInput(self, input, context: Context) -> None:
         if self.IsCompleted(context):
             return self.Reject(context)
+        input['cb'] = True
         return super().AcceptInput(input, context)
 

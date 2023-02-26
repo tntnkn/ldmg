@@ -26,9 +26,10 @@ class StorageFactory():
             user_input_model[field['id']] = None
             tags_by_field_id[field['id']] = field['tags']
 
-        states_branches_storage : Models.StatesBranchesStorage = dict()
-        possible_inp_ids : Models.PossibleInpIds = dict()
-        states_names : Models.StatesNames = dict()
+        forms_branches_storage : Models.StatesBranchesStorage  = dict()
+        possible_inp_ids       : Models.PossibleInpIds         = dict()
+        forms_names            : Models.StatesNames            = dict()
+        forms_behaviors        : Models.StatesBehavior         = dict()
 
         for s_id, state in g.states.items():
             branches : Models.StateBranches = list()
@@ -42,9 +43,10 @@ class StorageFactory():
                         g.transitions[tr_id]['target_id'],
                 }
                 branches.append(branch)
-            states_branches_storage[s_id] = branches
+            forms_branches_storage[s_id] = branches
             possible_inp_ids[s_id] = state['forms_ids']
-            states_names[s_id] = state['name']
+            forms_names[s_id]      = state['name']
+            forms_behaviors[s_id]  = state['behavior'].value
 
         docs = [
             {'tag' : doc['tag'], 'doc_name' : doc['doc_name']} for\
@@ -57,9 +59,11 @@ class StorageFactory():
             'end_ids'           : g.end_node_ids,
             'always_open_ids'   : g.always_open_ids,
             # info for display (names, descriptions)
-            'states_names'      : states_names,
+            'forms_names'       : forms_names,
+            # info for forms
+            'forms_behaviors'   : forms_behaviors,
             # info for branching
-            'branches'          : states_branches_storage,
+            'branches'          : forms_branches_storage,
             'possible_inp_ids'  : possible_inp_ids, 
             # info for docgen
             'tags_by_field_id'  : tags_by_field_id,

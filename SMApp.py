@@ -29,7 +29,7 @@ def main():
             """
             mapping = print_form(form)
             message['contents'] = get_input_to_return(mapping)
-        elif reply['type'] == 'pos_end':
+        elif reply['type'] == 'doc_info':
             for key, value in reply['contents'].items():
                 print(key, ' - ', value)
             print('WE ARE DONE!')

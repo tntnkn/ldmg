@@ -31,8 +31,8 @@ class FormElem():
         self.is_completed = False
 
     def IsCompleted(self, context: Context) -> bool:
-        return self.is_completed
-        #return True if context.user_input.Contains(self.storage_id) else False
+        #return self.is_completed
+        return True if context.user_input.Contains(self.storage_id) else False
 
     def IsGroupCompleted(self, context):
         for groupee in self.group:

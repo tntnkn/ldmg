@@ -1,5 +1,6 @@
 from typing     import TypedDict, Dict, List, Union
-from ..Types    import BranchTypes
+from ..Types    import BranchTypes, FormBehavior
+
 
 ID = str
 
@@ -15,9 +16,9 @@ class Branch(TypedDict):
     req_user_input_ids  : List[ID] 
     resulting_state_id  : ID
 
-StateBranches = List[Branch]
+FormsBranches = List[Branch]
 
-StatesBranchesStorage = Dict[ID, StateBranches]
+FormsBranchesStorage = Dict[ID, FormsBranches]
 
 class MainStorageContents(TypedDict):
     user_context        : UserContext
@@ -31,16 +32,18 @@ class Document(TypedDict):
     tag         : str
     doc_name    : str
 
-Documents = List[Document] 
-Tags      = Dict[ID, Union[List[str], None]]
-StatesNames = Dict[ID, str]
+Documents       = List[Document] 
+Tags            = Dict[ID, Union[List[str], None]]
+FormsNames      = Dict[ID, str]
+FormsBehaviors  = Dict[ID, str]
 
 class GeneralInfo(TypedDict):
     start_id            : ID
     end_ids             : ID
     always_open_ids     : ID
-    states_names        : StatesNames
-    branches            : StatesBranchesStorage
+    forms_names         : FormsNames
+    forms_behaviors     : FormsBehaviors
+    branches            : FormsBranchesStorage
     possible_inp_ids    : PossibleInpIds
     tags_by_field_id    : Tags
     documents           : Documents

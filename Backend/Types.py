@@ -1,7 +1,3 @@
-from enum        import Enum, auto, unique
-from dataclasses import dataclass
-
-
 class FormType():
     UNKNOWN         = 'UNKNOWN TYPE!'
     REGULAR_TEXT    = 'Простой текст'
@@ -13,6 +9,11 @@ class FormType():
     DOCUMENT        = 'Документ'
     DEFAULT         = 'По умолчанию' 
     ALWAYS_REACHABLE= 'Всегда доступно'
+
+
+class FormBehavior():
+    REGULAR             = 'FORM'
+    INPUT_CHECK         = 'INPUT_CHECK'
 
 
 class FormElemsTypes():

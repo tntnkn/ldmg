@@ -17,7 +17,7 @@ class MonoAPI(API):
             'start_id'        : self.general_info.Read('start_id'),
             'end_ids'         : self.general_info.Read('end_ids'),
             'always_open_ids' : self.general_info.Read('always_open_ids'),
-            'states_names'    : self.general_info.Read('states_names'),
+            'states_names'    : self.general_info.Read('forms_names'),
         }
         return {
             'user_id'   : None,

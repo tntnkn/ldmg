@@ -1,7 +1,6 @@
 from collections    import OrderedDict
 import json
 
-from .Factories     import FormElemFactory
 from .Interface     import FormElem
 from .StateHistory  import StateHistory
 from .Exceptions    import FormElemSwitchedHistory
@@ -17,7 +16,7 @@ class Form():
         self.fields         = OrderedDict()
 
         for f in fields: 
-            self.fields[f['id']] = FormElemFactory.Make(f)
+            self.fields[f.id] = f
 
         self.next_b_tpl     = {
             'id'        : 'next',
@@ -98,6 +97,9 @@ class Form():
                     else:
                         return branch['resulting_state_id']
         return None
+
+    def GetFieldsIds(self):
+        return list( self.fields.keys() )
 
     def ToJson(self, context) -> str:
         return json.dumps( self.ToDict(context) )

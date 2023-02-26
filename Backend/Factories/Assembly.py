@@ -20,15 +20,20 @@ class Assembly():
         Assembly.forms = forms
         Assembly.docs  = docs
 
-        print("Building forms factory")
-        FormPrototypeFactory.INIT(graph.states, forms)
-        Assembly.__PrintFormPrototypes()
-
+        print("Building storage")
         StorageFactory.INIT(graph, forms, docs)
         Assembly.storage = StorageFactory.Make()
+        print("Building active_users")
         ActiveUsersFactory.INIT(Assembly.storage)
         Assembly.active_users = ActiveUsersFactory.Make()
 
+        print("Building forms factory")
+        FormPrototypeFactory.INIT(
+                graph.states, 
+                forms) 
+        Assembly.__PrintFormPrototypes()
+
+        print("Building API")
         APIFactory.INIT(Assembly.active_users, 
                         Assembly.storage.GetGeneralInfoStorage(),
                         StateMachine())
@@ -41,7 +46,7 @@ class Assembly():
         print('\nForms are:')
         for form in FormPrototypeFactory.prototypes.values():
             print('- ', graph.states[form.id]['name'], form.fields, '\n')
-
+"""
         print('\nTesting prototype factory:')
         for form in FormPrototypeFactory.prototypes.values():
             copy = FormPrototypeFactory.Make(form.id)
@@ -50,4 +55,5 @@ class Assembly():
             copy = FormPrototypeFactory.Make(form.id)
             copy.id = 'LALALA'
             print('- ', form.id, copy.id)
+"""
 

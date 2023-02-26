@@ -13,10 +13,17 @@ class StateType(Enum):
     ALWAYS_OPEN         = 'ALWAYS_OPEN'
 
 
+class StateBehavior(Enum):
+    UNKNOWN             = 'UNKNOWN' 
+    FORM                = 'FORM'
+    INPUT_CHECK         = 'INPUT_CHECK'
+
+
 class State(TypedDict):
     id                              : ID_TYPE
     name                            : str
     type                            : StateType
+    behavior                        : StateBehavior
     is_start                        : bool
     is_end                          : bool
     forms_ids                       : List[ID_TYPE]
@@ -29,6 +36,7 @@ def get_dummy_state() -> State:
         'id'                    : '',
         'name'                  : 'dummy',
         'type'                  : StateType.UNKNOWN,
+        'behavior'              : StateBehavior.UNKNOWN,
         'is_start'              : False,
         'is_end'                : False,
         'forms_ids'             : list(),

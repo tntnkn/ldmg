@@ -1,8 +1,14 @@
 class StateFieldsConsts():
     NAME                = 'Название'
+    BEHAVIOR            = 'Поведение'
     FORMS               = 'Форма'
     IN_TRANSITIONS      = 'Входящие переходы'
     OUT_TRANSITIONS     = 'Выходящие переходы'
+
+
+class StateBehaviorConsts():
+    FORM                = 'Форма'
+    INPUT_CHECK         = 'Проверка ввода'
 
 
 class TransitionFieldConsts():

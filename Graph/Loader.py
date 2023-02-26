@@ -1,14 +1,14 @@
 from pyairtable  import Table
 from typing      import Dict, Tuple
 from .           import Config
-from .State      import State, StateType
+from .State      import State, StateType, StateBehavior
 from .Transition import Transition, TransitionType 
 from .Form       import Form, FormType
 from .Doc        import Doc
 from .Types      import ID_TYPE
 from .Graph      import Graph
 from .Exceptions import UnknownFormType, TableIsEmpty
-from .Models     import StateFieldsConsts, TransitionFieldConsts, TransitionTypesConsts, FormFieldConsts, DocFieldConsts 
+from .Models     import StateFieldsConsts, StateBehaviorConsts, TransitionFieldConsts, TransitionTypesConsts, FormFieldConsts, DocFieldConsts 
 
 
 class Loader():
@@ -81,6 +81,7 @@ class Loader():
                 'name'      : fields.get(
                         StateFieldsConsts.NAME, 'NO NAME'),
                 'type'      : StateType.UNKNOWN,
+                'behavior'  : StateBehavior.UNKNOWN,
                 'is_start'  : False,
                 'is_end'    : False,
                 'forms_ids' : list(), 
@@ -101,7 +102,18 @@ class Loader():
                 state['type'] = StateType.END
             else:
                 state['type'] = StateType.REGULAR
-            
+           
+            cond = fields.get(
+                StateFieldsConsts.BEHAVIOR)
+            match cond:
+                case StateBehaviorConsts.FORM:
+                    state['behavior']=StateBehavior.FORM
+                case StateBehaviorConsts.INPUT_CHECK:
+                    state['behavior']=StateBehavior.INPUT_CHECK
+                case _:
+                    raise RuntimeError(
+                        f"State {state['name']} does not have a behavior set")
+           
             self.graph.AddState(state)
         return self.graph.states
 
@@ -135,7 +147,7 @@ class Loader():
                     transition['type']=TransitionType.STRICT
                 case _:
                     raise RuntimeError(
-                      'Transitions does not have a condition set')
+                      f"Transition {transition['name']} does not have a condition set")
 
             self.graph.AddTransition(transition)
         return self.graph.transitions
