@@ -57,7 +57,7 @@ class InlineKeyboard(FormElemGroup):
             raise 'Wrong element type for Inline Keyboard'
         self.kb.add(
             InlineKeyboardButton(
-                text=elem['text'], 
+                text=self.__GetText(elem), 
                 callback_data=CallbackTransformer.Join(
                     elem['type'], 
                     elem['id'], 
@@ -89,4 +89,11 @@ class InlineKeyboard(FormElemGroup):
                 self.kb_desc = 'Выберете один из вариантов:'
             case 'M_CHOICE':
                 self.kb_desc = 'Выберете несколько из вариантов:'
+
+
+    def __GetText(self, elem):
+        pref = ''
+        if elem['completed']:
+            pref = "✔"
+        return pref + elem['text']
 
