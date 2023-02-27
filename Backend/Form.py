@@ -22,7 +22,7 @@ class Form():
             'id'        : 'next',
             'type'      : 'BUTTON',
             'cb'        : 'next',
-            'text'      : 'ДАЛЕЕ',
+            'text'      : 'СОХРАНИТЬ И ПРОДОЛЖИТЬ',
             'completed' : False,
         }
         self.prev_b_tpl     = {
@@ -36,7 +36,7 @@ class Form():
             'id'        : 'done',
             'type'      : 'BUTTON',
             'cb'        : 'done',
-            'text'      : 'ВСЁ',
+            'text'      : 'ЗАВЕРШИТЬ РАБОТУ',
             'completed' : False,
         }
 
