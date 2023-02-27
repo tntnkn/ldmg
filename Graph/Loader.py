@@ -158,13 +158,13 @@ class Loader():
             fields = record['fields']
             form : Form = {
                 'id'        : record['id'],
-                'name'      : fields.get(
-                    FormFieldConsts.NAME, 'NO NAME'),
+                'name'      : fields[FormFieldConsts.NAME],
                 'type'      : FormType.UNKNOWN,
+                'text'      : fields[FormFieldConsts.TEXT],
                 'state_id'  : fields.get(
                     FormFieldConsts.STATE_ID, None),
                 'tags'      : fields.get(
-                    FormFieldConsts.TAGS, None),
+                    FormFieldConsts.TAGS, ''),
             }
 
             t = record['fields'].get(FormFieldConsts.TYPE, None)

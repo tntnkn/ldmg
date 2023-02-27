@@ -20,14 +20,15 @@ class TransitionFieldConsts():
 
 
 class TransitionTypesConsts():
-    CONDITIONAL         = 'По формам'
-    STRICT              = 'Закончить все формы'
-    UNCONDITIONAL       = 'Без условия'
+    CONDITIONAL         = 'Условный'
+    UNCONDITIONAL       = 'Безусловный'
+    STRICT              = 'Строгий'
 
 
 class FormFieldConsts():
     NAME                = 'Название'
     TYPE                = 'Тип'
+    TEXT                = 'Описание'
     STATE_ID            = 'Состояние'
     TAGS                = 'jinja tags'
 

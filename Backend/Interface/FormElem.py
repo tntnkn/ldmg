@@ -11,7 +11,7 @@ class FormElem():
         self.id: M.ID           = field['id']
         self.storage_id: M.ID   = field['id']
 
-        self.text: str = field['name'] 
+        self.text: str = field['text'] 
         self.desc: str = ''
         self.cb: str   = str(field['id'])
 
