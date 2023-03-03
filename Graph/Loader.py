@@ -16,62 +16,120 @@ class Loader():
         self.states_records         = list()
         self.transitions_records    = list()
         self.forms_records          = list()
-        self.docs_records           = list()
+        self.config_records         = list()
+        self.states_external        = list()
 
         self.forms : Dict[ID_TYPE, Form] = dict()
         self.docs  : Dict[ID_TYPE, Doc]  = dict()
 
         self.graph                  = Graph()
 
-    def load_tables(self):
-        config = Config.get()
-
-        states_table        = Table(config.AIRTABLE_API_KEY, 
-                                config.AIRTABLE_BASE_ID,
-                                config.AIRTABLE_STATES_TABLE_ID)
-        self.states_records = states_table.all() 
-        if len(self.states_records) == 0:
-            raise TableIsEmpty('States')
-
-        transitions_table   = Table(config.AIRTABLE_API_KEY, 
-                                config.AIRTABLE_BASE_ID,
-                                config.AIRTABLE_TRANSITIONS_TABLE_ID)
-        self.transitions_records = transitions_table.all() 
-        if len(self.transitions_records) == 0:
-            raise TableIsEmpty('Transitions')
-
-        forms_table         = Table(config.AIRTABLE_API_KEY, 
-                                config.AIRTABLE_BASE_ID,
-                                config.AIRTABLE_FORMS_TABLE_ID,
-                                )
-        self.forms_records  = forms_table.all(
-            view=config.AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID)
-        if len(self.forms_records) == 0:
-            raise TableIsEmpty('Forms')
-
-        docs_table          = Table(config.AIRTABLE_API_KEY, 
-                                config.AIRTABLE_BASE_ID,
-                                config.AIRTABLE_DOCS_TABLE_ID,
-                                )
-        self.docs_records  = docs_table.all()
-        if len(self.docs_records) == 0:
-            raise TableIsEmpty('Docs')
-
-    
-    def load_graph(self):
-        if len(self.states_records) == 0 or\
-           len(self.transitions_records) == 0 or\
-           len(self.forms_records) == 0 or\
-           len(self.docs_records) == 0:
-               self.load_tables()
+    def load(self,
+             AIRTABLE_API_KEY, 
+             AIRTABLE_BASE_ID,
+             AIRTABLE_STATES_TABLE_ID,
+             AIRTABLE_STATES_TABLE_MAIN_VIEW_ID,
+             AIRTABLE_TRANSITIONS_TABLE_ID,
+             AIRTABLE_TRANSITION_TABLE_MAIN_VIEW_ID,
+             AIRTABLE_FORMS_TABLE_ID,
+             AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID,
+             AIRTABLE_CONFIG_TABLE_ID,
+             AIRTABLE_CONFIG_TABLE_MAIN_VIEW_ID
+        ):
+        self.load_tables(
+            AIRTABLE_API_KEY, 
+            AIRTABLE_BASE_ID,
+            AIRTABLE_STATES_TABLE_ID,
+            AIRTABLE_STATES_TABLE_MAIN_VIEW_ID,
+            AIRTABLE_TRANSITIONS_TABLE_ID,
+            AIRTABLE_TRANSITION_TABLE_MAIN_VIEW_ID,
+            AIRTABLE_FORMS_TABLE_ID,
+            AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID,
+            AIRTABLE_CONFIG_TABLE_ID,
+            AIRTABLE_CONFIG_TABLE_MAIN_VIEW_ID
+        ) 
 
         s = self.process_states_records()
         t = self.process_transitions_records()
         f = self.process_forms_records()
-        d = self.process_docs_records()
+        c = self.process_config_records()
 
         self.connect_states_with_forms(s, f)
 
+        print("--states")
+        print(s)
+        print("--transitions")
+        print(t)
+        print("--forms")
+        print(f)
+        print("--config")
+        print(c)
+
+        print("CHEKING FORMS")
+        for state in s.values():
+            for form_id in state['forms_ids']:
+                print(f[form_id])
+
+
+        for ext in self.states_external:
+            print(f"PROCESSING EXTERNAL STATE {ext['name']}")
+            ext_data = ext['external_table_data']
+            loader = Loader()
+            loader.load(AIRTABLE_API_KEY, *ext_data.splitlines())
+            print("RESOURCES LOADED")
+
+            self.graph.AttachAnotherGraph(loader.graph, ext)
+            self.forms.update(loader.forms)
+            self.docs.update(loader.docs)
+            print("DONE")
+    
+    def load_tables(
+            self,
+            AIRTABLE_API_KEY, 
+            AIRTABLE_BASE_ID,
+            AIRTABLE_STATES_TABLE_ID,
+            AIRTABLE_STATES_TABLE_MAIN_VIEW_ID,
+            AIRTABLE_TRANSITIONS_TABLE_ID,
+            AIRTABLE_TRANSITION_TABLE_MAIN_VIEW_ID,
+            AIRTABLE_FORMS_TABLE_ID,
+            AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID,
+            AIRTABLE_CONFIG_TABLE_ID,
+            AIRTABLE_CONFIG_TABLE_MAIN_VIEW_ID):
+        config = Config.get()
+
+        states_table        = Table(AIRTABLE_API_KEY, 
+                                    AIRTABLE_BASE_ID,
+                                    AIRTABLE_STATES_TABLE_ID)
+        self.states_records = states_table.all( 
+            view=AIRTABLE_STATES_TABLE_MAIN_VIEW_ID)
+        if len(self.states_records) == 0:
+            raise TableIsEmpty('States')
+
+        transitions_table   = Table(AIRTABLE_API_KEY, 
+                                    AIRTABLE_BASE_ID,
+                                    AIRTABLE_TRANSITIONS_TABLE_ID)
+        self.transitions_records = transitions_table.all( 
+            view=AIRTABLE_TRANSITION_TABLE_MAIN_VIEW_ID)
+        if len(self.transitions_records) == 0:
+            raise TableIsEmpty('Transitions')
+
+        forms_table         = Table(AIRTABLE_API_KEY, 
+                                    AIRTABLE_BASE_ID,
+                                    AIRTABLE_FORMS_TABLE_ID,
+                                )
+        self.forms_records  = forms_table.all(
+            view=AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID)
+        if len(self.forms_records) == 0:
+            raise TableIsEmpty('Forms')
+    
+        config_table        = Table(AIRTABLE_API_KEY, 
+                                    AIRTABLE_BASE_ID,
+                                    AIRTABLE_CONFIG_TABLE_ID,
+                                )
+        self.config_records = config_table.all(
+            view=AIRTABLE_CONFIG_TABLE_MAIN_VIEW_ID)
+        if len(self.config_records) == 0:
+            raise TableIsEmpty('Config')
 
     def process_states_records(self):
         for record in self.states_records:
@@ -91,6 +149,8 @@ class Loader():
                 'out_transitions_ids' : [
                     a_id for a_id in fields.get( 
                         StateFieldsConsts.OUT_TRANSITIONS, list() )],
+                'external_table_data'   : fields.get( 
+                        StateFieldsConsts.EXTERANL_TABLE_DATA, '' ),
             }
 
             if   len(state['in_transitions_ids'])  == 0 and\
@@ -110,6 +170,9 @@ class Loader():
                     state['behavior']=StateBehavior.FORM
                 case StateBehaviorConsts.INPUT_CHECK:
                     state['behavior']=StateBehavior.INPUT_CHECK
+                case StateBehaviorConsts.EXTERNAL:
+                    state['behavior']=StateBehavior.EXTERNAL
+                    self.states_external.append(state)
                 case _:
                     raise RuntimeError(
                         f"State {state['name']} does not have a behavior set")
@@ -182,17 +245,16 @@ class Loader():
         return self.forms
 
 
-    def process_docs_records(self):
-        for record in self.docs_records:
+    def process_config_records(self):
+        for record in self.config_records:
             fields = record['fields']
-            suit : Doc = {
+            doc : Doc = {
                 'id'        : record['id'],
                 'name'      : fields[DocFieldConsts.NAME],
                 'tag'       : fields[DocFieldConsts.TAG],
-                'doc_name'  : fields[DocFieldConsts.DOC_NAME],
             }
             
-            self.docs[suit['id']] = suit
+            self.docs[doc['id']] = doc
         return self.docs
 
 
@@ -229,7 +291,7 @@ if __name__ == '__main__':
     loader.process_states_records()
     loader.process_transitions_records()
     loader.process_forms_records()
-    loader.process_docs_records()
+    loader.process_config_records()
     loader.load_graph()
     print('\n\n')
     print('STATES')

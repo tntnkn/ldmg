@@ -8,7 +8,6 @@ class Doc(TypedDict, total=True):
     id              : ID_TYPE
     name            : str
     tag             : str
-    doc_name        : str
 
 
 def get_dummy_doc() -> Doc:
@@ -16,11 +15,10 @@ def get_dummy_doc() -> Doc:
         'id'            : '',
         'name'          : 'dummy',
         'tag'           : '',
-        'doc_name'      : '',
     }
 
 
 if __name__ == '__main__':
-    suit : Doc = get_dummy_doc()
-    print(suit)
+    doc : Doc = get_dummy_doc()
+    print(doc)
 

@@ -1,8 +1,4 @@
-#TODO:
-#   1) replace string exceptions with normal ones;
-#   2) derive execptions from Exception;
-
-from Graph             import Loader
+from Graph             import API as GAPI
 from DashApp           import CytoGraph
 from DashApp.elements  import cytograph, main_page
 
@@ -10,11 +6,10 @@ from dash import Dash, Input, Output
 
 app = Dash(__name__)
 
-loader = Loader()
-loader.load_graph()
-graph = loader.graph
+resp  = GAPI().Load()
+graph = resp['graph']
 
-cgraph = CytoGraph(loader.graph) 
+cgraph = CytoGraph(graph) 
 
 def main():
     global cgraph

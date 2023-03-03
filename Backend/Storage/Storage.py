@@ -36,6 +36,11 @@ class Storage(StorageInterface):
         }
         self.__NewUser(user_id, new_user_info)
 
+    def DeleteUser(user_id: M.ID) -> None:
+        if not self.HasUser(user_id):
+            return
+        self.main_storage.pop(user_id)
+
     def GetUserContext(self, user_id: M.ID) -> Context:
         return Context( self.__GetUserInput(user_id),
                         self.__GetUserContext(user_id),

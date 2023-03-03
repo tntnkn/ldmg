@@ -1,9 +1,7 @@
 from Backend.Factories  import Assembly
 
 
-def get_api(loader):
-    loader.load_graph()
-
-    Assembly.Assemble(loader)
+def get_api(load_info):
+    Assembly.Assemble(load_info)
     return Assembly.api 
 

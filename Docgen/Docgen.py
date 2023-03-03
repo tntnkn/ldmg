@@ -13,8 +13,9 @@ class DocHandle():
 
 class Docgen():
     def __init__(self, docs : Dict):
+        print("Docs are", docs)
         self.docs_info = [
-            { 'tag' : doc['tag'], 'name' : doc['doc_name'] } for
+            { 'tag' : doc['tag'], 'name' : doc['name'] } for
                 doc in docs.values()
         ]
 
@@ -39,7 +40,8 @@ class Docgen():
         templates_dir   = os.path.join(file_dir, 'templates')
 
         for doc in self.docs_info:
-            if doc['tag'] in tags: 
+            print(doc)
+            if tags.get(doc['tag'], None):
                 return DocxTemplate(
                     os.path.join(templates_dir, doc['name']))
         return None

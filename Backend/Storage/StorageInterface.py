@@ -11,6 +11,8 @@ class StorageInterface():
         raise NotImplementedError
     def AddUser(self, user_id: M.ID) -> None:
         raise NotImplementedError
+    def DeleteUser(user_id: M.ID) -> None:
+        raise NotImplementedError
     def GetUserContext(self, user_id: M.ID) -> Context:
-        return NotImplemented
+        raise NotImplementedError
 

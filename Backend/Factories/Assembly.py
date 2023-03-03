@@ -13,9 +13,9 @@ class Assembly():
 
     @staticmethod
     def Assemble(loader):
-        graph = loader.graph
-        forms = loader.forms
-        docs  = loader.docs
+        graph = loader['graph']
+        forms = loader['forms']
+        docs  = loader['docs']
         Assembly.graph = graph
         Assembly.forms = forms
         Assembly.docs  = docs

@@ -4,11 +4,13 @@ class StateFieldsConsts():
     FORMS               = 'Форма'
     IN_TRANSITIONS      = 'Входящие переходы'
     OUT_TRANSITIONS     = 'Выходящие переходы'
+    EXTERANL_TABLE_DATA = 'Внешняя таблица'
 
 
 class StateBehaviorConsts():
     FORM                = 'Форма'
     INPUT_CHECK         = 'Проверка ввода'
+    EXTERNAL            = 'Внешняя таблица'
 
 
 class TransitionFieldConsts():
@@ -34,7 +36,6 @@ class FormFieldConsts():
 
 
 class DocFieldConsts():
-    NAME                = 'Иск'
-    TAG                 = 'tag'
-    DOC_NAME            = 'Название документа'
+    NAME                = 'Название'
+    TAG                 = 'Тэг'
 

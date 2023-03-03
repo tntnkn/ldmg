@@ -1,14 +1,13 @@
-from Graph              import Loader
+from Graph              import API as GAPI
 from Backend.Factories  import Assembly
 
 
 def main():
 
     print("Loading graph")
-    loader = Loader()
-    loader.load_graph()
+    resp = GAPI().Load()
 
-    Assembly.Assemble(loader)
+    Assembly.Assemble(resp)
     back_api = Assembly.api 
 
     user_id = back_api.NewUser()

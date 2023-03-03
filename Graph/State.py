@@ -17,6 +17,7 @@ class StateBehavior(Enum):
     UNKNOWN             = 'UNKNOWN' 
     FORM                = 'FORM'
     INPUT_CHECK         = 'INPUT_CHECK'
+    EXTERNAL            = 'EXTERNAL'
 
 
 class State(TypedDict):
@@ -29,6 +30,7 @@ class State(TypedDict):
     forms_ids                       : List[ID_TYPE]
     in_transitions_ids              : List[ID_TYPE]
     out_transitions_ids             : List[ID_TYPE]
+    external_table_data             : str
 
 
 def get_dummy_state() -> State:
@@ -42,6 +44,7 @@ def get_dummy_state() -> State:
         'forms_ids'             : list(),
         'in_transitions_ids'    : list(),
         'out_transitions_ids'   : list(),
+        'external_table_data'   : '' 
     }
 
 

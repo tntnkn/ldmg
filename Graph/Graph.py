@@ -52,6 +52,36 @@ class Graph():
 
         return transition
 
+    def AttachAnotherGraph(self, another, ext_state):
+        for idx, end_id in enumerate(self.end_node_ids):
+            if end_id == ext_state['id']:
+                self.end_node_ids.pop(idx)
+                break
+        else:
+            raise RuntimeError(
+                f"State {ext_state['name']} is not an end state!")
+
+        if ext_state['id'] not in self.states:
+            raise RuntimeError(
+                f"State {ext_state['name']} is not in graph!")
+
+        original_state = self.states[ext_state['id']]
+        repleace_state = another.states[another.start_node_id]
+        for k, v in self.transitions.items():
+            if v['target_id'] == original_state['id']:
+                v['target_id'] = repleace_state['id']
+                break
+        else:
+            raise RuntimeError(
+                f"State {ext_state['name']} is not a target of any transition!")
+        self.states.pop(ext_state['id'])
+
+        self.end_node_ids.extend(another.end_node_ids)
+        self.always_open_ids.extend(another.always_open_ids)
+        self.states.update(another.states)
+        self.transitions.update(another.transitions)
+
+
 
 if __name__ == '__main__':
     pass

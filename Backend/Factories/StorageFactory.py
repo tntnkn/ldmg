@@ -49,7 +49,7 @@ class StorageFactory():
             forms_behaviors[s_id]  = state['behavior'].value
 
         docs = [
-            {'tag' : doc['tag'], 'doc_name' : doc['doc_name']} for\
+            {'tag' : doc['tag'], 'name' : doc['name']} for\
                 doc in StorageFactory.docs.values()
         ]
         
