@@ -2,54 +2,54 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher.handler     import CancelHandler
 from aiogram import types
 
-from services.sessionManager import sessionManager
-from static.types            import userSession 
+from ..Utils                        import (SessionLock, 
+                                            update_user_last_action_time)
+from ..Storage                      import Storage
 
-sm = sessionManager.get()
 
 class sessionControl(BaseMiddleware):
-    async def on_process_update(self, update: types.Update, data: dict):
-        #print("IN SESSION CONTROL")
-        if   "message" in update:
-            self.__on_process_update_message(update, data)
-        elif "callback_query" in update:
-            self.__on_process_update_callback_query(update, data)
-        else:
-            raise CancelHandler()
-        if not sm.lockSession(data["session"].from_id):
+    async def on_process_update(
+            self, 
+            update: types.Update, 
+            data: dict):
+        print('IN ON PRE PROCESS')
+        tg_user_id = sessionControl.__get_tg_id(update)
+        if not tg_user_id:
             raise CancelHandler()
 
-    def __on_process_update_message(self, update, data: dict):
-        message = update["message"]
-        from_id = message["from"]["id"]
-        if not sm.hasSession(from_id):
-            sm.addSession(from_id)
-        session = sm.getSession(from_id)  
-        sm.recordSessionAction(from_id)
-        session.from_id = from_id
-        session.message = message 
-        session.ms_text = message["text"] 
-        data["session"] = session
+        print('BEFIRE STORAGE')
+        s_h = Storage()
+        if not s_h.HasUser(tg_user_id):
+            s_h.AddUser(tg_user_id)
+        
+        if not SessionLock.Lock(tg_user_id):
+            raise CancelHandler()
+        print('SESSION LOCKED')
 
-    def __on_process_update_callback_query(
-            self, update: types.Update, data: dict):
-        cb_query= update["callback_query"]
-        from_id = cb_query["from"]["id"] 
-        if not sm.hasSession(from_id):
-            sm.addSession(from_id)
-        session = sm.getSession(from_id)  
-        sm.recordSessionAction(from_id)
-        session.from_id = from_id
-        session.message = cb_query.message 
-        session.ms_text = session.message["text"] 
-        session.cb_query= cb_query
-        session.cb_data = cb_query["data"]
-        data["session"] = session
+        update_user_last_action_time(tg_user_id)
+        print('TIME UPDATED')
 
     async def on_post_process_update(
-            self, update: types.Update,data_from_handler: list, data: dict):
-        session = data["session"]
-        sm.unlockSession(session.from_id)
-        if session.current_state is None:
-            await sm.deleteSession(session.from_id)
+            self, 
+            update: types.Update,
+            data_from_handler: list,
+            data: dict):
+        print('IN ON POST PROCESS')
+        tg_user_id = sessionControl.__get_tg_id(update)
+        if not tg_user_id:
+            raise CancelHandler()
+
+        try:
+            SessionLock.Unlock(tg_user_id)
+        except:
+            print('SOME SHIT HAPPENED')
+            pass
         
+    def __get_tg_id(update):
+        tg_user_id = None
+        if   "message" in update:
+            tg_user_id = update['message']['from']['id']
+        elif "callback_query" in update:
+            tg_user_id = update['callback_query']['from']['id']
+        return tg_user_id
+

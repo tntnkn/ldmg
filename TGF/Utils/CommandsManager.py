@@ -10,6 +10,7 @@ from ..Storage  import Storage
 class CommandsManager():
     translator = None
 
+    @staticmethod
     def SetCommands():
         storage     = Storage()
         back_info   = storage.GetBackInfo() 

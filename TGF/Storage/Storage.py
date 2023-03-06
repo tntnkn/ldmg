@@ -1,4 +1,5 @@
 from typing         import Dict, Union, List, TypedDict
+from time           import time
 
 from ..Static       import AllowedInputType
 from ..Utils        import AllowedInputTypeHelper
@@ -29,6 +30,8 @@ class UserDataModel():
     compressed_back_data    : Union[str, None]
     messages_displayed      : List
     displayed_form          : Union[Form, None]
+    last_action_time        : int
+    is_locked               : bool
 
 
 class Storage():
@@ -54,6 +57,8 @@ class Storage():
             'compressed_back_data'    : None,
             'messages_displayed'      : list(),
             'displayed_form'          : None,
+            'last_action_time'        : time(),
+            'is_locked'               : False,
         }
 
     def DeleteUser(self, tg_user_id):
@@ -68,6 +73,9 @@ class Storage():
         if not self.HasUser(tg_user_id):
             raise 'No user with tg id ' + str(tg_user_id)
         return Storage.users[tg_user_id]
+
+    def GetUsersIds(self):
+        return list( self.users.keys() )
 
     def SetBackInfo(self, back_info):
         Storage.back_info = back_info
