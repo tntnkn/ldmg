@@ -35,13 +35,13 @@ class Send():
     @staticmethod
     async def NoTextInputWarning(tg_user_id):
         return await MessageManager.SendText(
-                'Сейчас нельзя ничего написать!', 
+                'Сейчас нельзя ничего написать.\nЕсли Вы ещё не начинали работу, то нажмите /start.', 
                 tg_user_id)
 
     @staticmethod
     async def NoButtonPressWarning(tg_user_id):
         return await MessageManager.SendText(
-                'Сейчас нельзя нажимать на кнопки!', 
+                'Сейчас нельзя нажимать на кнопки.\nЕсли Вы ещё не начинали работу, то нажмите /start.', 
                 tg_user_id)
 
     @staticmethod

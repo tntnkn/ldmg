@@ -64,15 +64,15 @@ async def otherCommandsHandler(message: types.Message):
     tg_user_id  = message.from_id
     command     = message.text
 
-    try:
-        s_view  = UserStorageView(message.from_id)
-    except:
+    MessagesArchive.Memo(message.message_id, tg_user_id)
+
+    s_view  = UserStorageView(tg_user_id)
+    allowed = s_view.Read('allowed_input_types')
+    if not AllowedInputTypeHelper.CheckIfInputIsAllowed(
+            AllowedInputType.COMMANDS, allowed):
         await Send.NoCommandsInputWarning(tg_user_id)
         return
 
-    MessagesArchive.Memo(message.message_id, tg_user_id)
-
-    allowed = s_view.Read('allowed_input_types')
     allowed = AllowedInputTypeHelper.DeleteAllowedInput(
             AllowedInputType.TEXT, allowed)
     s_view.Write('allowed_input_types', allowed)
