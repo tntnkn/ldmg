@@ -5,8 +5,8 @@ from ..Storage      import UsersLoop
 
 
 class DanglingSessionsManager():
-    DANGLING_SESSIONS_CHECKUP_STRIDE   = 20 * 60
-    MAX_ALLOWED_DANGLING_TIME          = 60 * 60
+    DANGLING_SESSIONS_CHECKUP_STRIDE   = 1 * 60
+    MAX_ALLOWED_DANGLING_TIME          = 1 * 60
 
     @staticmethod
     def Start():

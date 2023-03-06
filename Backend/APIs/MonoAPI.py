@@ -30,6 +30,9 @@ class MonoAPI(API):
         self.active_users.AddUser(user_id)
         return user_id
 
+    def DeleteUser(self, back_id) -> None:
+        self.active_users.DeleteUser(back_id)
+
     def AcceptInput(self, message: Message) -> Message:
         user_id = message['user_id']
         context = self.active_users.GetUserContext(user_id)

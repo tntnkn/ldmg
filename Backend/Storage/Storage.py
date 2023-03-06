@@ -36,7 +36,7 @@ class Storage(StorageInterface):
         }
         self.__NewUser(user_id, new_user_info)
 
-    def DeleteUser(user_id: M.ID) -> None:
+    def DeleteUser(self, user_id: M.ID) -> None:
         if not self.HasUser(user_id):
             return
         self.main_storage.pop(user_id)

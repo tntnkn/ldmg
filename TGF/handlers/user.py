@@ -42,10 +42,7 @@ async def handle_back_request(contents, s_view):
 
 @dp.message_handler(commands=['start'])
 async def startCommandHandler(message: types.Message):
-    user_id = back_api.NewUser() 
-    #Storage().AddUser(message.from_id)
     s_view  = UserStorageView(message.from_id)
-    s_view.Write('back_id', user_id)
 
     MessagesArchive.Memo(message.message_id, message.from_id)
 

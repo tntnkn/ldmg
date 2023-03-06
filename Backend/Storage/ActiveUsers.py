@@ -18,7 +18,7 @@ class ActiveUsers(StorageInterface):
     def AddUser(self, user_id: M.ID) -> None: 
         return self.storage.AddUser(user_id)
     
-    def DeleteUser(user_id: M.ID) -> None:
+    def DeleteUser(self, user_id: M.ID) -> None:
         if user_id not in self.user_context_cache:
             return
         self.storage.DeleteUser(user_id)

@@ -3,6 +3,7 @@ from time           import time
 
 from ..Static       import AllowedInputType
 from ..Utils        import AllowedInputTypeHelper
+from ..Factories    import BackAPIFactory
 from ..keyboards    import Form
 
 
@@ -34,6 +35,7 @@ class UserDataModel():
     is_locked               : bool
 
 
+
 class Storage():
     users       : UserDataModel             = dict()
     back_info   : Union[BackInfo, None]     = None 
@@ -47,11 +49,14 @@ class Storage():
         if self.HasUser(tg_user_id):
             self.DeleteUser(tg_user_id)
 
+        back_api = BackAPIFactory.Make()
+        user_id  = back_api.NewUser() 
+
         allowed_input_types = \
             AllowedInputTypeHelper.SetAllowedInputTypes(
                     AllowedInputType.COMMAND)
         Storage.users[tg_user_id] = {
-            'back_id'                 : None,
+            'back_id'                 : user_id,
             'allowed_input_types'     : allowed_input_types,
             'form_desc'               : None,
             'compressed_back_data'    : None,
@@ -64,7 +69,9 @@ class Storage():
     def DeleteUser(self, tg_user_id):
         if not self.HasUser(tg_user_id):
             return
-        Storage.users.pop(tg_user_id)
+        user = Storage.users.pop(tg_user_id)
+        back_api = BackAPIFactory.Make()
+        back_api.DeleteUser( user['back_id'] )
 
     def HasUser(self, tg_user_id):
         return Storage.users.get(tg_user_id, None) != None
