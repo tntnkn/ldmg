@@ -47,9 +47,24 @@ class GeneralInfoStorage(StorageView):
     def Delete(self, key):
         raise OperationIsNotSupported('Delete') 
 
+class FormsInfoStorage(StorageView):
+    def __init__(self, forms_info):
+        super().__init__(forms_info)
+
+    def Write(self, key, value):
+        raise OperationIsNotSupported('Write') 
+
+    def Delete(self, key):
+        raise OperationIsNotSupported('Delete') 
+
 class Context():
-    def __init__(self, user_input, user_context, general_info):
+    def __init__(self, 
+                 user_input, 
+                 user_context, 
+                 general_info,
+                 forms_info):
         self.user_input     = user_input
         self.user_context   = user_context
         self.general_info   = general_info
+        self.forms_info     = forms_info
 

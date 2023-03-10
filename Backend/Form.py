@@ -73,10 +73,9 @@ class Form():
 
     def DetermineNextState(self, context: Context) -> Union[M.ID, None]:
         cur_id   = StateHistory.GetCurrent(context)
-        branches = context.general_info.Read('branches')[cur_id]
+        branches = context.forms_info.Read(cur_id)['form_branches']
         u_input  = context.user_input
-        all_inps = context.general_info.Read(
-                'possible_inp_ids')[cur_id]
+        all_inps = context.forms_info.Read(cur_id)['possible_inp_ids']
 
         for branch in branches:
             match branch['type'].value:

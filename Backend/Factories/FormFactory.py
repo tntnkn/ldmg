@@ -33,9 +33,9 @@ class FormPrototypeFactory():
     @staticmethod
     def Get(form_id: M.ID, context : Context) -> Form:
         form  = FormPrototypeFactory.prototypes[form_id]
-        behav = context.general_info.Read('forms_behaviors')
-        print("BEHAV", behav[form_id])
-        if behav[form_id] == FormBehavior.REGULAR:
+        behav = context.forms_info.Read(form_id)['form_behavior']
+        print("BEHAV", behav)
+        if behav == FormBehavior.REGULAR:
             return form
 
         ids   = form.GetFieldsIds()

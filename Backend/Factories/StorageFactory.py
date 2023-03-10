@@ -26,10 +26,11 @@ class StorageFactory():
             user_input_model[field['id']] = None
             tags_by_field_id[field['id']] = field['tags']
 
+        forms_info  : Models.FormsInfo = { }
+        forms_names            : Models.FormsNames             = dict()
+        forms_behaviors        : Models.FormsBehavior          = dict()
         forms_branches_storage : Models.StatesBranchesStorage  = dict()
         possible_inp_ids       : Models.PossibleInpIds         = dict()
-        forms_names            : Models.StatesNames            = dict()
-        forms_behaviors        : Models.StatesBehavior         = dict()
 
         for s_id, state in g.states.items():
             branches : Models.StateBranches = list()
@@ -43,10 +44,13 @@ class StorageFactory():
                         g.transitions[tr_id]['target_id'],
                 }
                 branches.append(branch)
-            forms_branches_storage[s_id] = branches
-            possible_inp_ids[s_id] = state['forms_ids']
-            forms_names[s_id]      = state['name']
-            forms_behaviors[s_id]  = state['behavior'].value
+            form : Models.Form = {
+                'form_name'             : state['name'],
+                'form_behavior'         : state['behavior'].value,
+                'form_branches'         : branches,
+                'possible_inp_ids'      : state['forms_ids'],
+            }
+            forms_info[s_id] = form 
 
         docs = [
             {'tag' : doc['tag'], 'name' : doc['name']} for\
@@ -58,16 +62,10 @@ class StorageFactory():
             'start_id'          : g.start_node_id,
             'end_ids'           : g.end_node_ids,
             'always_open_ids'   : g.always_open_ids,
-            # info for display (names, descriptions)
-            'forms_names'       : forms_names,
-            # info for forms
-            'forms_behaviors'   : forms_behaviors,
-            # info for branching
-            'branches'          : forms_branches_storage,
-            'possible_inp_ids'  : possible_inp_ids, 
             # info for docgen
             'tags_by_field_id'  : tags_by_field_id,
             'documents'         : docs
         }
-        return Storage(user_input_model, general_info)
+
+        return Storage(user_input_model, general_info, forms_info)
 

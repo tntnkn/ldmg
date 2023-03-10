@@ -41,9 +41,14 @@ class GeneralInfo(TypedDict):
     start_id            : ID
     end_ids             : ID
     always_open_ids     : ID
-    forms_names         : FormsNames
-    forms_behaviors     : FormsBehaviors
-    branches            : FormsBranchesStorage
-    possible_inp_ids    : PossibleInpIds
     tags_by_field_id    : Tags
     documents           : Documents
+
+class Form(TypedDict):
+    form_name           : str
+    form_behavior       : str
+    branches            : FormsBranches
+    possible_inp_ids    : List[ID]
+
+FormsInfo = Dict[ID, Form]
+

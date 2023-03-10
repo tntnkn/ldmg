@@ -2,17 +2,21 @@ from copy   import deepcopy
 
 from .                  import Models as M
 from .StorageInterface  import StorageInterface
-from .Context           import Context, UserInputStorage, UserContextStorage, GeneralInfoStorage
+from .Context           import (Context, UserInputStorage, 
+                                UserContextStorage, GeneralInfoStorage, 
+                                FormsInfoStorage)
 from ..Exceptions       import UserNotInDatabase, UserAlreadyInDatabase
 
 
 class Storage(StorageInterface):
     def __init__(self, 
-                 user_input_model: M.UserInput, 
-                 general_info: M.GeneralInfo) -> None:
-        self.user_input_model: M.UserInput = user_input_model
-        self.general_info: M.GeneralInfo = general_info
-        self.main_storage: M.MainStorage = dict() 
+                 user_input_model : M.UserInput, 
+                 general_info     : M.GeneralInfo,
+                 forms_info       : M.FormsInfo) -> None:
+        self.user_input_model   : M.UserInput   = user_input_model
+        self.general_info       : M.GeneralInfo = general_info
+        self.forms_info         : M.FormsInfo   = forms_info
+        self.main_storage       : M.MainStorage = dict() 
 
     def HasUser(self, user_id) -> bool:
         if user_id in self.main_storage:
@@ -44,7 +48,8 @@ class Storage(StorageInterface):
     def GetUserContext(self, user_id: M.ID) -> Context:
         return Context( self.__GetUserInput(user_id),
                         self.__GetUserContext(user_id),
-                        self.GetGeneralInfoStorage() )
+                        self.GetGeneralInfoStorage(),
+                        self.GetFormsInfoStorage() )
 
     def __GetUserInput(self, user_id: M.ID) -> UserInputStorage:
         self.AssertUser(user_id)
@@ -58,6 +63,9 @@ class Storage(StorageInterface):
 
     def GetGeneralInfoStorage(self) -> GeneralInfoStorage:
         return GeneralInfoStorage(self.general_info)
+
+    def GetFormsInfoStorage(self) -> FormsInfoStorage:
+        return FormsInfoStorage(self.forms_info)
 
     def __NewUser(self, user_id: M.ID, contents:M.MainStorageContents):
         self.main_storage[user_id] = contents
