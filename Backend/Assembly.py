@@ -1,5 +1,7 @@
-from Backend.Factories  import FormPrototypeFactory, StorageFactory, ActiveUsersFactory, APIFactory
-from Backend.StateMachine import StateMachine 
+from Backend.Factories      import (FormPrototypeFactory, StorageFactory, 
+                                    ActiveUsersFactory, APIFactory)
+from Backend.StateMachine   import StateMachine 
+from Backend.StateHistory   import StateHistory 
 
 
 class Assembly():
@@ -30,8 +32,12 @@ class Assembly():
         print("Building forms factory")
         FormPrototypeFactory.INIT(
                 graph.states, 
-                forms) 
+                forms,
+                Assembly.storage) 
         Assembly.__PrintFormPrototypes()
+
+        print("BEFORE STATEHOSTORY INIT")
+        StateHistory.INIT(FormPrototypeFactory)
 
         print("Building API")
         APIFactory.INIT(Assembly.active_users, 

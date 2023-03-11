@@ -47,7 +47,7 @@ class GeneralInfo(TypedDict):
 class Form(TypedDict):
     form_name           : str
     form_behavior       : str
-    branches            : FormsBranches
+    form_branches       : FormsBranches
     possible_inp_ids    : List[ID]
 
 FormsInfo = Dict[ID, Form]

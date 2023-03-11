@@ -10,10 +10,11 @@ from copy       import deepcopy
 
 class FormPrototypeFactory():
     prototypes: Dict[M.ID, Form] = dict()
-    fields = None
+    fields  = None
+    storage = None
 
     @staticmethod
-    def INIT(states, fields):
+    def INIT(states, fields, storage):
         FormPrototypeFactory.fields = fields
         for state in states.values():
             #print(" -- STATE FORMS IDS ARE ", state['forms_ids'])
@@ -22,6 +23,7 @@ class FormPrototypeFactory():
                 FormPrototypeFactory.__FieldsToFormElems(state['forms_ids'])
             FormPrototypeFactory.prototypes[state['id']] = \
                 Form(state['id'], fields)
+            FormPrototypeFactory.storage = storage
 
     @staticmethod
     def Make(form_id: M.ID) -> Form:
@@ -33,6 +35,7 @@ class FormPrototypeFactory():
     @staticmethod
     def Get(form_id: M.ID, context : Context) -> Form:
         form  = FormPrototypeFactory.prototypes[form_id]
+        print("FI ID IN FF ==", id(context.forms_info.storage))
         behav = context.forms_info.Read(form_id)['form_behavior']
         print("BEHAV", behav)
         if behav == FormBehavior.REGULAR:
@@ -46,6 +49,25 @@ class FormPrototypeFactory():
         fields = FormPrototypeFactory.__FieldsToFormElems(ids)
 
         return Form(form.id, fields)
+
+    @staticmethod
+    def CopyNarrowing(form_id: M.ID, context: Context) -> Form:
+        inp = context.user_input.ReadAll()
+        fi  = context.forms_info.Read(form_id)['possible_inp_ids']
+        empty_inp = {
+            k: inp[k] for k in fi if inp[k] is None
+        }
+        h = hash( tuple( sorted( empty_inp.keys() )))
+        print("FF COPY NARROWING H", h)
+        if h not in FormPrototypeFactory.prototypes:
+            fields = \
+                FormPrototypeFactory.__FieldsToFormElems(empty_inp.keys())
+            FormPrototypeFactory.prototypes[h] = \
+                Form(h, fields)
+            FormPrototypeFactory.storage.CopyNarrowingFormInfo(
+                    form_id, h, list( empty_inp.keys() ) )
+
+        return FormPrototypeFactory.prototypes[h]
 
     @staticmethod
     def __FieldsToFormElems(fields_ids):

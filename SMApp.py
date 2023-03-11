@@ -1,5 +1,5 @@
 from Graph              import API as GAPI
-from Backend.Factories  import Assembly
+from Backend            import Assembly
 
 
 def main():

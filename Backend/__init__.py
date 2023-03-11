@@ -1,4 +1,4 @@
-from Backend.Factories  import Assembly
+from .Assembly  import Assembly
 
 
 def get_api(load_info):

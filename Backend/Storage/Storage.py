@@ -40,6 +40,27 @@ class Storage(StorageInterface):
         }
         self.__NewUser(user_id, new_user_info)
 
+    def CopyNarrowingFormInfo(self, 
+                              old_form_id, 
+                              new_form_id,
+                              inp_ids):
+        print("COPY NARROWING STORAGE", new_form_id)
+        fi = self.forms_info[old_form_id]
+        pi = fi['possible_inp_ids']
+        br = fi['form_branches']
+        new_br = list()
+        for i in inp_ids:
+            for b in br:
+                if i in b['req_user_input_ids']:
+                    new_br.append(b)
+        self.forms_info[new_form_id] = {
+            'form_name'         : fi['form_name'], 
+            'form_behavior'     : fi['form_behavior'],
+            'form_branches'     : new_br,
+            'possible_inp_ids'  : inp_ids,
+        }
+        print("FI IDS ===", id(self.forms_info))
+
     def DeleteUser(self, user_id: M.ID) -> None:
         if not self.HasUser(user_id):
             return

@@ -5,6 +5,13 @@ from typing         import Union
 
 
 class StateHistory():
+    FormFactory = None
+
+    @staticmethod
+    def INIT(FormFactoryClass):
+        print("STATE HISTORY INITED")
+        StateHistory.FormFactory = FormFactoryClass
+
     @staticmethod
     def GetCurrent(context: Context) -> M.ID:
         idx = context.user_context.Read('current_state_idx')
@@ -26,6 +33,11 @@ class StateHistory():
         reject = hst[idx+1:-1]
         context.user_context.Write('rejected_states', reject)
         hst = hst[0:idx+1]
+        if next_id in hst:
+            form = StateHistory.FormFactory.CopyNarrowing(
+                    next_id, context)
+            next_id = form.id
+            print("SH COPY NARROWING NEXT ID RESULTING", next_id)
         if next_id:
             hst.append(next_id)
         context.user_context.Write('state_history', hst)
