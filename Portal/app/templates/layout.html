@@ -1,0 +1,61 @@
+<!doctype html>
+
+{% if title %}
+    <title>{{ title }}</title>
+{% else %}
+    <title>Портал визуализации</title>
+{% endif %}
+
+<body>
+    <header>
+        <nav>
+            <div>
+                <a  class=""
+                    href="{{ url_for('home') }}">
+                    Портал
+                </a>
+                <div class="">
+                    <div>
+                        <a  class=""
+                            href="{{ url_for('home') }}">
+                            Домой
+                        </a>
+                        <a  class=""
+                            href="{{ url_for('account') }}">
+                            Аккаунт
+                        </a>
+                    </div> 
+                    <div>
+                        {% if user_is_authed %}
+                            <a  class=""
+                                href="{{ url_for('logout') }}">
+                                Выйти
+                            </a>
+                        {% else %}
+                            <a  class=""
+                                href="{{ url_for('login') }}">
+                                Войти
+                            </a>
+                        {% endif %}
+                    </div> 
+                </div>
+            </div>
+        </nav>
+    </header>
+</body>
+
+<main>
+    <div class="">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</main>

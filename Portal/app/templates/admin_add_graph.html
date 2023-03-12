@@ -1,0 +1,182 @@
+{% extends "admin_layout.html" %}
+
+{% block admin %}
+<div>
+    <form method="POST" action="{{ url_for("admin_add_graph") }}">
+        {{ form.hidden_tag() }}
+        <fieldset>
+            <legend>{{ title }}</legend> 
+                <div>
+                    {{ form.name.label() }}
+                    {% if form.name.errors %}
+                        {{ form.name() }}
+                        <div>
+                            {% for error in form.name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.name() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.user_email.label() }}
+                    {% if form.user_email.errors %}
+                        {{ form.user_email() }}
+                        <div>
+                            {% for error in form.user_email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.user_email() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_api_key.label() }}
+                    {% if form.airtable_api_key.errors %}
+                        {{ form.airtable_api_key() }}
+                        <div>
+                            {% for error in form.airtable_api_key.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_api_key() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_base_id.label() }}
+                    {% if form.airtable_base_id.errors %}
+                        {{ form.airtable_base_id() }}
+                        <div>
+                            {% for error in form.airtable_base_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_base_id() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_states_table_id.label() }}
+                    {% if form.airtable_states_table_id.errors %}
+                        {{ form.airtable_states_table_id() }}
+                        <div>
+                            {% for error in form.airtable_states_table_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_states_table_id() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_states_table_view_id.label() }}
+                    {% if form.airtable_states_table_view_id.errors %}
+                        {{ form.airtable_states_table_view_id() }}
+                        <div>
+                            {% for error in form.airtable_states_table_view_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_states_table_view_id() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_transitions_table_id.label() }}
+                    {% if form.airtable_transitions_table_id.errors %}
+                        {{ form.airtable_transitions_table_id() }}
+                        <div>
+                            {% for error in form.airtable_transitions_table_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_transitions_table_id() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_transition_table_view_id.label() }}
+                    {% if form.airtable_transition_table_view_id.errors %}
+                        {{ form.airtable_transition_table_view_id() }}
+                        <div>
+                            {% for error in form.airtable_transition_table_view_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_transition_table_view_id() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_forms_table_id.label() }}
+                    {% if form.airtable_forms_table_id.errors %}
+                        {{ form.airtable_forms_table_id() }}
+                        <div>
+                            {% for error in form.airtable_forms_table_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_forms_table_id() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_forms_table_view_id.label() }}
+                    {% if form.airtable_forms_table_view_id.errors %}
+                        {{ form.airtable_forms_table_view_id() }}
+                        <div>
+                            {% for error in form.airtable_forms_table_view_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_forms_table_view_id() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_config_table_id.label() }}
+                    {% if form.airtable_config_table_id.errors %}
+                        {{ form.airtable_config_table_id() }}
+                        <div>
+                            {% for error in form.airtable_config_table_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_config_table_id() }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.airtable_config_table_view_id.label() }}
+                    {% if form.airtable_config_table_view_id.errors %}
+                        {{ form.airtable_config_table_view_id() }}
+                        <div>
+                            {% for error in form.airtable_config_table_view_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.airtable_config_table_view_id() }}
+                    {% endif %}
+                </div>
+        </fieldset>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+</div>
+{% endblock admin %}
