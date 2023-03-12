@@ -8,7 +8,7 @@ class MessageManager():
         resp = await bot.send_message(
                  tg_user_id, 
                  text,
-                 parse_mode=ParseMode.HTML)
+                 parse_mode=ParseMode.MARKDOWN)
         return resp.message_id
 
     @staticmethod
@@ -17,7 +17,7 @@ class MessageManager():
                  tg_user_id, 
                  kb_desc,
                  reply_markup=kb,
-                 parse_mode=ParseMode.HTML)
+                 parse_mode=ParseMode.MARKDOWN)
         return resp.message_id
 
     @staticmethod
