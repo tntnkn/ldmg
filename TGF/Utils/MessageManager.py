@@ -56,3 +56,9 @@ class Send():
                 'Прежде всего нажмите /start', 
                 tg_user_id)
 
+    @staticmethod
+    async def TooLongInput(tg_user_id):
+        return await MessageManager.SendText(
+                'Ввод получился слишком длинным, попробуйте покороче:', 
+                tg_user_id)
+

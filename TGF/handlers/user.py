@@ -3,6 +3,7 @@ from ..Storage      import UserStorageView, Storage
 from ..Utils        import (CallbackTransformer, AllowedInputTypeHelper, 
                             Send, MessagesArchive, MessageManager)
 from ..Static       import AllowedInputType
+from ..validators   import check_input_length
 from ..bot          import dp, types
 
 
@@ -40,7 +41,7 @@ async def handle_back_request(contents, s_view):
 
 # --- Commands Handlers
 
-@dp.message_handler(commands=['start'])
+@dp.message_handler(commands=['start', 'help'])
 async def startCommandHandler(message: types.Message):
     s_view  = UserStorageView(message.from_id)
 
@@ -103,6 +104,11 @@ async def generalTextMessageHandler(message: types.Message):
     if not AllowedInputTypeHelper.CheckIfInputIsAllowed(
             AllowedInputType.TEXT, allowed):
         id = await Send.NoTextInputWarning(tg_user_id)
+        MessagesArchive.Memo(id, tg_user_id)
+        return
+
+    if not check_input_length(message.text):
+        id = await Send.TooLongInput(tg_user_id)
         MessagesArchive.Memo(id, tg_user_id)
         return
 
