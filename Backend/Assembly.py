@@ -42,6 +42,7 @@ class Assembly():
         print("Building API")
         APIFactory.INIT(Assembly.active_users, 
                         Assembly.storage.GetGeneralInfoStorage(),
+                        Assembly.storage.GetFormsInfoStorage(),
                         StateMachine())
         Assembly.api = APIFactory.Make()
 

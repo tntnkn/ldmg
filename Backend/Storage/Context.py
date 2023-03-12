@@ -57,6 +57,9 @@ class FormsInfoStorage(StorageView):
     def Delete(self, key):
         raise OperationIsNotSupported('Delete') 
 
+    def ReadAll(self):
+        return self.storage
+
 class Context():
     def __init__(self, 
                  user_input, 
