@@ -1,5 +1,8 @@
+
+
 class MaxDmgLoader():
-    from .src import Loader
+    from .Loader    import Loader 
+    from .API       import API
 
     def __init():
         pass

@@ -1,0 +1,22 @@
+[build-system]
+requires = [
+    "setuptools>=61.0", 
+    "python-dotenv==1.0.0",
+    "pyairtable==1.4.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name    = "maxdmg_resource"
+version = "0.0.3"
+authors = [
+  { name="tonotonokon" },
+]
+description = "This is a resource loader for maxdmg project."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]

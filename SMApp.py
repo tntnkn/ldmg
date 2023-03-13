@@ -1,4 +1,4 @@
-from Graph              import MaxDmgLoader 
+from maxdmg_resource    import MaxDmgLoader 
 from Backend            import Assembly
 
 from dotenv             import load_dotenv
