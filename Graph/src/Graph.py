@@ -1,9 +1,10 @@
 from typing      import Union, Dict, List
-from .State      import State, StateType 
-from .Transition import Transition
-from .Form       import Form 
-from .Exceptions import StartNodeAlreadyExists, EndNodeAlreadyExists, SourceNodeNotInGraph, TargetNodeNotInGraph
-from .Types      import ID_TYPE
+from .Types      import (State, StateType, StateBehavior, 
+                         Transition, TransitionType, 
+                         Form, FormType, Doc,
+                         ID_TYPE)
+from .Exceptions import (StartNodeAlreadyExists, EndNodeAlreadyExists, 
+                         SourceNodeNotInGraph, TargetNodeNotInGraph)
 
 
 class Graph():

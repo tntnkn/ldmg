@@ -1,7 +1,7 @@
 from typing     import TypedDict, List, Dict, Union
 from enum       import Enum, unique
 
-from .Types     import ID_TYPE
+from .          import ID_TYPE
 
 
 @unique

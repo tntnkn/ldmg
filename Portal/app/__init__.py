@@ -1,3 +1,5 @@
+from maxdmgloader import API 
+
 from flask          import Flask
 from .config        import Config
 from .auth          import init_auth, require_login 

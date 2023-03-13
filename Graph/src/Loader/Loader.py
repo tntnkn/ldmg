@@ -1,14 +1,15 @@
 from pyairtable  import Table
 from typing      import Dict, Tuple
-from .           import Config
-from .State      import State, StateType, StateBehavior
-from .Transition import Transition, TransitionType 
-from .Form       import Form, FormType
-from .Doc        import Doc
-from .Types      import ID_TYPE
-from .Graph      import Graph
-from .Exceptions import UnknownFormType, TableIsEmpty
-from .Models     import StateFieldsConsts, StateBehaviorConsts, TransitionFieldConsts, TransitionTypesConsts, FormFieldConsts, DocFieldConsts 
+
+from ..Types     import (State, StateType, StateBehavior, 
+                         Transition, TransitionType, 
+                         Form, FormType, Doc,
+                         ID_TYPE)
+from ..Graph     import Graph
+from ..Exceptions import UnknownFormType, TableIsEmpty
+from .Models     import (StateFieldsConsts, StateBehaviorConsts, 
+                         TransitionFieldConsts, TransitionTypesConsts, 
+                         FormFieldConsts, DocFieldConsts)
 
 
 class Loader():
@@ -95,8 +96,6 @@ class Loader():
             AIRTABLE_FORMS_TABLE_MAIN_VIEW_ID,
             AIRTABLE_CONFIG_TABLE_ID,
             AIRTABLE_CONFIG_TABLE_MAIN_VIEW_ID):
-        config = Config.get()
-
         states_table        = Table(AIRTABLE_API_KEY, 
                                     AIRTABLE_BASE_ID,
                                     AIRTABLE_STATES_TABLE_ID)
